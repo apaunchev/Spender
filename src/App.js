@@ -1,7 +1,8 @@
+import { useRoutes } from "hookrouter";
 import React from "react";
+import NotFound from "./pages/not-found";
+import routes from "./routes";
 
-function App() {
-  return <div className="App">App</div>;
-}
+const App = () => useRoutes(routes) || <NotFound />;
 
 export default App;
