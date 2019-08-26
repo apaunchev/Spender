@@ -56,3 +56,17 @@ export const compareBy = (key, desc = false) => {
     return a[key] > b[key] ? -1 : b[key] > a[key] ? 1 : 0;
   };
 };
+
+export const groupBy = (objectArray, property) => {
+  return objectArray.reduce((acc, obj) => {
+    const key = obj[property];
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(obj);
+    return acc;
+  }, {});
+};
+
+export const sumOfObjectValues = (objectArray, property) =>
+  objectArray.reduce((acc, cur) => acc + cur[property], 0);

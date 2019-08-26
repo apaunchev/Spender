@@ -1,17 +1,25 @@
 import {
   addMonths,
+  endOfMonth,
   format,
   isWithinInterval,
   startOfMonth,
-  endOfMonth,
   subMonths
 } from "date-fns";
 import { A } from "hookrouter";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import Blankslate from "../../components/blankslate";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
-import { compareBy, formatAmountInCurrency } from "../../utils";
+import {
+  compareBy,
+  formatAmountInCurrency,
+  formatAmountInPercent,
+  getTotalAmountFromArray,
+  groupBy,
+  sumOfObjectValues
+} from "../../utils";
 
 const Expenses = () => {
   // Local storage
@@ -46,9 +54,63 @@ const Expenses = () => {
     setFormattedExpenses([...formattedExpenses].sort(compareBy(field, desc)));
   };
 
-  if (loading) {
-    return null;
-  }
+  // Helpers
+  const renderBar = (expenses, budgets, limit = 5) => {
+    const groupedByBudget = groupBy(expenses, "budget");
+    const budgetsWithAmounts = Object.keys(groupedByBudget)
+      .map(budgetId => {
+        const { id, name, color } = budgets.find(b => b.id === budgetId) || {};
+        return {
+          id,
+          name,
+          color,
+          amount: sumOfObjectValues(groupedByBudget[budgetId], "amount")
+        };
+      })
+      .sort(compareBy("amount", true));
+    const budgetsWithAmountsAndOthers = [
+      ...budgetsWithAmounts.slice(0, limit),
+      {
+        id: "_others",
+        name: "Others",
+        color: "#323232",
+        amount: getTotalAmountFromArray(budgetsWithAmounts.slice(limit))
+      }
+    ];
+
+    if (getTotalAmountFromArray(budgetsWithAmountsAndOthers) === 0) {
+      return null;
+    }
+
+    return (
+      <div className="bar">
+        {Object.keys(budgetsWithAmountsAndOthers).map(budgetId => {
+          const { id, name, color, amount } = budgetsWithAmountsAndOthers[
+            budgetId
+          ];
+          const percentOfExpenses = formatAmountInPercent(
+            (amount / getTotalAmountFromArray(expenses)) * 100
+          );
+
+          return (
+            <div
+              key={id}
+              className="bar__segment"
+              style={{
+                backgroundColor: color,
+                width: percentOfExpenses
+              }}
+              title={`${name} (${percentOfExpenses})`}
+            >
+              <span className="bar__segment__title">
+                {name} ({percentOfExpenses})
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -84,67 +146,78 @@ const Expenses = () => {
               </button>
             </nav>
           </header>
-          <div className="table-wrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>
-                    <a href="/dashboard" onClick={e => onSort(e, "date", true)}>
-                      Date
-                    </a>
-                  </th>
-                  <th>
-                    <a href="/dashboard" onClick={e => onSort(e, "budget")}>
-                      Budget
-                    </a>
-                  </th>
-                  <th>
-                    <a href="/dashboard" onClick={e => onSort(e, "payee")}>
-                      Payee
-                    </a>
-                  </th>
-                  <th className="tar">
-                    <a
-                      href="/dashboard"
-                      onClick={e => onSort(e, "amount", true)}
-                    >
-                      Amount
-                    </a>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {formattedExpenses.map(
-                  ({ id, date, amount, budget, payee }) => {
-                    const b = budgets.find(b => b.id === budget) || {};
+          {renderBar(formattedExpenses, budgets)}
+          {!loading && formattedExpenses.length ? (
+            <div className="table-wrap">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>
+                      <a
+                        href="/dashboard"
+                        onClick={e => onSort(e, "date", true)}
+                      >
+                        Date
+                      </a>
+                    </th>
+                    <th>
+                      <a href="/dashboard" onClick={e => onSort(e, "budget")}>
+                        Budget
+                      </a>
+                    </th>
+                    <th>
+                      <a href="/dashboard" onClick={e => onSort(e, "payee")}>
+                        Payee
+                      </a>
+                    </th>
+                    <th className="tar">
+                      <a
+                        href="/dashboard"
+                        onClick={e => onSort(e, "amount", true)}
+                      >
+                        Amount
+                      </a>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formattedExpenses.map(
+                    ({ id, date, amount, budget, payee }) => {
+                      const b = budgets.find(b => b.id === budget) || {};
 
-                    return (
-                      <tr key={id}>
-                        <td>
-                          <A href={`/expense/${id}`}>
-                            {new Date(date).toLocaleDateString()}
-                          </A>
-                        </td>
-                        <td>
-                          <span
-                            className="color-pill"
-                            style={{
-                              backgroundColor: b.color || "#212121"
-                            }}
-                          />
-                          {b.name}
-                        </td>
-                        <td>{payee}</td>
-                        <td className="tar mono">
-                          {formatAmountInCurrency(amount)}
-                        </td>
-                      </tr>
-                    );
-                  }
-                )}
-              </tbody>
-            </table>
-          </div>
+                      return (
+                        <tr key={id}>
+                          <td>
+                            <A href={`/expense/${id}`}>
+                              {new Date(date).toLocaleDateString()}
+                            </A>
+                          </td>
+                          <td>
+                            <span
+                              className="color-pill"
+                              style={{
+                                backgroundColor: b.color || "#212121"
+                              }}
+                            />
+                            {b.name}
+                          </td>
+                          <td>{payee}</td>
+                          <td className="tar mono">
+                            {formatAmountInCurrency(amount)}
+                          </td>
+                        </tr>
+                      );
+                    }
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <Blankslate
+              title="Nothing found"
+              description="Looks like there are no expenses to show here yet."
+            />
+          )}
         </div>
       </main>
       <Footer />
