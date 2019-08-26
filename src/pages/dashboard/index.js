@@ -118,18 +118,21 @@ const Dashboard = () => {
               <button
                 className="button"
                 onClick={() => setCurrentDate(subMonths(currentDate, 1))}
+                title="Jump to previous month"
               >
                 &larr;
               </button>
               <button
                 className="button"
                 onClick={() => setCurrentDate(new Date())}
+                title="Jump to current month"
               >
                 {format(currentDate, "MMM yyyy")}
               </button>
               <button
                 className="button"
                 onClick={() => setCurrentDate(addMonths(currentDate, 1))}
+                title="Jump to next month"
               >
                 &rarr;
               </button>
