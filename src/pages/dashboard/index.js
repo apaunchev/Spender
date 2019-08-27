@@ -15,7 +15,8 @@ import { useLocalStorage } from "../../hooks/useLocalStorage";
 import {
   formatAmountInCurrency,
   getTotalAmountFromArray,
-  compareBy
+  compareBy,
+  formatAmountInPercent
 } from "../../utils";
 
 const Dashboard = () => {
@@ -155,6 +156,17 @@ const Dashboard = () => {
             <tbody>
               {formattedBudgets.map(({ id, name, amount, color }) => {
                 const currentForBudget = getMTDForBudget(id);
+                const currentAsPercent = formatAmountInPercent(
+                  (currentForBudget / amount) * 100,
+                  0
+                );
+                let warningOrDangerClass = "";
+                if (currentForBudget > amount * 0.7) {
+                  warningOrDangerClass = "warning";
+                }
+                if (currentForBudget > amount) {
+                  warningOrDangerClass = "danger";
+                }
 
                 return (
                   <tr key={id}>
@@ -170,11 +182,13 @@ const Dashboard = () => {
                     </td>
                     <td
                       data-label="Current"
-                      className={`tar ${
-                        currentForBudget > amount ? "danger" : ""
-                      }`}
+                      className={`tar ${warningOrDangerClass}`}
+                      title={currentAsPercent}
                     >
-                      {formatAmountInCurrency(currentForBudget, currency)}
+                      {formatAmountInCurrency(currentForBudget, currency)}{" "}
+                      <small className="small-screen-only">
+                        ({currentAsPercent})
+                      </small>
                     </td>
                   </tr>
                 );

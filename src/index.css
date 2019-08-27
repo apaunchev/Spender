@@ -216,6 +216,10 @@ main > section:last-child {
   border-right: 1px solid var(--divider);
 }
 
+.table td[title] {
+  cursor: help;
+}
+
 @media screen and (max-width: 600px) {
   .table thead,
   .table tfoot th {
@@ -476,4 +480,14 @@ input[type="submit"],
 
 .no-wrap {
   white-space: nowrap;
+}
+
+.small-screen-only {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .small-screen-only {
+    display: inline-block;
+  }
 }
