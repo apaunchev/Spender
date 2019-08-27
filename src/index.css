@@ -469,3 +469,7 @@ input[type="submit"],
 .tappable {
   cursor: pointer;
 }
+
+.no-wrap {
+  white-space: nowrap;
+}
