@@ -178,15 +178,15 @@ main > section:last-child {
 
 @media (max-width: 600px) {
   .bar {
-    margin-bottom: 1.5rem;
+    margin: 2rem 0 0;
+  }
+
+  .bar__segment__title {
+    display: inline-block;
   }
 }
 
 /* Table */
-
-.table-wrap {
-  overflow-x: auto;
-}
 
 .table {
   margin-bottom: 1.5rem;
@@ -195,11 +195,6 @@ main > section:last-child {
 }
 
 .table thead {
-  border-top: 1px solid var(--divider);
-}
-
-.table thead,
-.table tbody {
   border-bottom: 2px solid var(--border);
 }
 
@@ -208,6 +203,7 @@ main > section:last-child {
 }
 
 .table tr {
+  border-top: 1px solid var(--divider);
   border-bottom: 1px solid var(--divider);
 }
 
@@ -218,6 +214,43 @@ main > section:last-child {
   vertical-align: top;
   border-left: 1px solid var(--divider);
   border-right: 1px solid var(--divider);
+}
+
+@media screen and (max-width: 600px) {
+  .table thead,
+  .table tfoot th {
+    border: none;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+
+  .table tr {
+    border-bottom: 3px solid var(--divider);
+    display: block;
+    margin-bottom: 0.625rem;
+  }
+
+  .table td {
+    border-bottom: 1px solid var(--divider);
+    display: block;
+    text-align: right;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    color: var(--text);
+  }
+
+  .table td:last-child {
+    border-bottom: 0;
+  }
 }
 
 /* Color pill */

@@ -53,9 +53,6 @@ const Dashboard = () => {
   };
 
   // Helpers
-  const getBalanceAmount = (budgets, expenses) =>
-    getTotalAmountFromArray(budgets) - getTotalAmountFromArray(expenses);
-
   const renderBalanceMessage = (amount, currency, budgets) => {
     const RISK_THRESHOLD = 0.3;
     const formattedAmount = formatAmountInCurrency(amount, currency);
@@ -94,6 +91,10 @@ const Dashboard = () => {
     return getTotalAmountFromArray(expensesForBudget);
   };
 
+  const totalPlanned = getTotalAmountFromArray(budgets);
+
+  const totalCurrent = getTotalAmountFromArray(formattedExpenses);
+
   if (loading) {
     return null;
   }
@@ -102,11 +103,7 @@ const Dashboard = () => {
     <>
       <Header />
       <main>
-        {renderBalanceMessage(
-          getBalanceAmount(budgets, formattedExpenses),
-          currency,
-          budgets
-        )}
+        {renderBalanceMessage(totalPlanned - totalCurrent, currency, budgets)}
         <hr />
         <div>
           <header className="mb3 flex flex--between">
@@ -139,72 +136,67 @@ const Dashboard = () => {
             </nav>
           </header>
           <Bar data={budgets} />
-          <div className="table-wrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th width="100%">
-                    <a href="/dashboard" onClick={e => onSort(e, "name")}>
-                      Name
-                    </a>
-                  </th>
-                  <th className="tar">
-                    <a
-                      href="/dashboard"
-                      onClick={e => onSort(e, "amount", true)}
-                    >
-                      Planned
-                    </a>
-                  </th>
-                  <th className="tar">Current</th>
-                </tr>
-              </thead>
-              <tbody>
-                {formattedBudgets.map(({ id, name, amount, color }) => {
-                  const current = getMTDForBudget(id);
+          <table className="table">
+            <thead>
+              <tr>
+                <th width="100%">
+                  <a href="/dashboard" onClick={e => onSort(e, "name")}>
+                    Name
+                  </a>
+                </th>
+                <th className="tar">
+                  <a href="/dashboard" onClick={e => onSort(e, "amount", true)}>
+                    Planned
+                  </a>
+                </th>
+                <th className="tar">Current</th>
+              </tr>
+            </thead>
+            <tbody>
+              {formattedBudgets.map(({ id, name, amount, color }) => {
+                const currentForBudget = getMTDForBudget(id);
 
-                  return (
-                    <tr key={id}>
-                      <td>
-                        <span
-                          className="color-pill"
-                          style={{ backgroundColor: color }}
-                        />
-                        <A href={`/budget/${id}`}>{name}</A>
-                      </td>
-                      <td className="tar mono">
-                        {formatAmountInCurrency(amount, currency)}
-                      </td>
-                      <td
-                        className={`tar mono ${
-                          current > amount ? "danger" : ""
-                        }`}
-                      >
-                        {formatAmountInCurrency(current, currency)}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th>Total</th>
-                  <td className="tar bold mono">
-                    {formatAmountInCurrency(
-                      getTotalAmountFromArray(budgets),
-                      currency
-                    )}
-                  </td>
-                  <td className="tar bold mono">
-                    {formatAmountInCurrency(
-                      getTotalAmountFromArray(formattedExpenses),
-                      currency
-                    )}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+                return (
+                  <tr key={id}>
+                    <td data-label="Name">
+                      <span
+                        className="color-pill"
+                        style={{ backgroundColor: color }}
+                      />
+                      <A href={`/budget/${id}`}>{name}</A>
+                    </td>
+                    <td data-label="Amount" className="tar">
+                      {formatAmountInCurrency(amount, currency)}
+                    </td>
+                    <td
+                      data-label="Current"
+                      className={`tar ${
+                        currentForBudget > amount ? "danger" : ""
+                      }`}
+                    >
+                      {formatAmountInCurrency(currentForBudget, currency)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              <tr>
+                <th>Total</th>
+                <td data-label="Total planned" className="tar bold">
+                  {formatAmountInCurrency(totalPlanned, currency)}
+                </td>
+                <td
+                  data-label="Total current"
+                  className={`tar bold ${
+                    totalCurrent > totalPlanned ? "danger" : ""
+                  }`}
+                >
+                  {formatAmountInCurrency(totalCurrent, currency)}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </main>
       <Footer />
