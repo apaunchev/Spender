@@ -435,11 +435,6 @@ input[type="submit"],
   }
 }
 
-.mono {
-  font-family: monospace;
-  font-size: 1.25rem;
-}
-
 .bold {
   font-weight: bold;
 }
