@@ -459,11 +459,15 @@ input[type="submit"],
 
 .danger,
 .error {
-  color: var(--red);
+  color: var(--red) !important;
+}
+
+.warning {
+  color: var(--orange) !important;
 }
 
 .success {
-  color: var(--green);
+  color: var(--green) !important;
 }
 
 .tappable {
