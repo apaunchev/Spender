@@ -146,67 +146,72 @@ const Expenses = () => {
               </button>
             </nav>
           </header>
-          {renderBar(formattedExpenses, budgets)}
           {!loading && formattedExpenses.length ? (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>
-                    <a href="/dashboard" onClick={e => onSort(e, "date", true)}>
-                      Date
-                    </a>
-                  </th>
-                  <th>
-                    <a href="/dashboard" onClick={e => onSort(e, "budget")}>
-                      Budget
-                    </a>
-                  </th>
-                  <th>
-                    <a href="/dashboard" onClick={e => onSort(e, "payee")}>
-                      Payee
-                    </a>
-                  </th>
-                  <th className="tar">
-                    <a
-                      href="/dashboard"
-                      onClick={e => onSort(e, "amount", true)}
-                    >
-                      Amount
-                    </a>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {formattedExpenses.map(
-                  ({ id, date, amount, budget, payee }) => {
-                    const b = budgets.find(b => b.id === budget) || {};
+            <>
+              {renderBar(formattedExpenses, budgets)}
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>
+                      <a
+                        href="/dashboard"
+                        onClick={e => onSort(e, "date", true)}
+                      >
+                        Date
+                      </a>
+                    </th>
+                    <th>
+                      <a href="/dashboard" onClick={e => onSort(e, "budget")}>
+                        Budget
+                      </a>
+                    </th>
+                    <th>
+                      <a href="/dashboard" onClick={e => onSort(e, "payee")}>
+                        Payee
+                      </a>
+                    </th>
+                    <th className="tar">
+                      <a
+                        href="/dashboard"
+                        onClick={e => onSort(e, "amount", true)}
+                      >
+                        Amount
+                      </a>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formattedExpenses.map(
+                    ({ id, date, amount, budget, payee }) => {
+                      const b = budgets.find(b => b.id === budget) || {};
 
-                    return (
-                      <tr key={id}>
-                        <td data-label="Date">
-                          <A href={`/expense/${id}`}>
-                            {new Date(date).toLocaleDateString()}
-                          </A>
-                        </td>
-                        <td data-label="Budget">
-                          <span
-                            className="color-pill"
-                            style={{
-                              backgroundColor: b.color || "#212121"
-                            }}
-                          />
-                          {b.name}
-                        </td>
-                        <td data-label="Payee">{payee || "–"}</td>
-                        <td data-label="Amount" className="tar">
-                          {formatAmountInCurrency(amount)}
-                        </td>
-                      </tr>
-                    );
-                  }
-                )}
-              </tbody>
-            </table>
+                      return (
+                        <tr key={id}>
+                          <td data-label="Date">
+                            <A href={`/expense/${id}`}>
+                              {new Date(date).toLocaleDateString()}
+                            </A>
+                          </td>
+                          <td data-label="Budget">
+                            <span
+                              className="color-pill"
+                              style={{
+                                backgroundColor: b.color || "#212121"
+                              }}
+                            />
+                            {b.name}
+                          </td>
+                          <td data-label="Payee">{payee || "–"}</td>
+                          <td data-label="Amount" className="tar">
+                            {formatAmountInCurrency(amount)}
+                          </td>
+                        </tr>
+                      );
+                    }
+                  )}
+                </tbody>
+              </table>
+            </>
           ) : (
             <Blankslate
               title="Nothing found"
