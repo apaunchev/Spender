@@ -318,6 +318,7 @@ input[type="submit"] {
   font: inherit;
   border-radius: 0;
   -webkit-appearance: none;
+  touch-action: manipulation;
 }
 
 .button:hover,
