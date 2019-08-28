@@ -70,3 +70,9 @@ export const groupBy = (objectArray, property) => {
 
 export const sumOfObjectValues = (objectArray, property) =>
   objectArray.reduce((acc, cur) => acc + cur[property], 0);
+
+export const toDateInputValue = date => {
+  const local = new Date(date);
+  local.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return local.toJSON().slice(0, 10);
+};

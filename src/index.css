@@ -367,7 +367,8 @@ input[type="submit"],
 .form-input select,
 .form-input textarea,
 .form-input input[type="text"],
-.form-input input[type="number"] {
+.form-input input[type="number"],
+.form-input input[type="date"] {
   box-sizing: inherit;
   color: inherit;
   width: 100%;

@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
-import { ID } from "../../utils";
+import { ID, toDateInputValue } from "../../utils";
+import { format } from "date-fns";
 
 const Expense = ({ id }) => {
   // Local storage
@@ -13,13 +14,14 @@ const Expense = ({ id }) => {
   // State
   const [amount, setAmount] = useState("");
   const [budget, setBudget] = useState("");
+  const [date, setDate] = useState(toDateInputValue(new Date()));
   const [payee, setPayee] = useState("");
   const [notes, setNotes] = useState("");
 
   // Effects
   useEffect(() => {
     if (id) {
-      const { amount, budget, payee, notes } =
+      const { amount, budget, date, payee, notes } =
         expenses.find(e => e.id === id) || {};
 
       if (!amount) {
@@ -28,6 +30,7 @@ const Expense = ({ id }) => {
 
       setAmount(amount);
       setBudget(budget);
+      setDate(format(new Date(date), "yyyy-MM-dd"));
       setPayee(payee);
       setNotes(notes);
     }
@@ -37,17 +40,27 @@ const Expense = ({ id }) => {
   const onSubmit = e => {
     e.preventDefault();
 
-    setExpenses([
-      ...expenses,
-      {
-        id: ID(),
-        date: new Date(),
-        amount,
-        budget,
-        payee,
-        notes
-      }
-    ]);
+    if (!id) {
+      // create
+      setExpenses([
+        ...expenses,
+        {
+          id: ID(),
+          date,
+          amount,
+          budget,
+          payee,
+          notes
+        }
+      ]);
+    } else {
+      // update
+      setExpenses(
+        expenses.map(e =>
+          e.id === id ? { id, date, amount, budget, payee, notes } : e
+        )
+      );
+    }
 
     navigate("/dashboard");
   };
@@ -100,6 +113,16 @@ const Expense = ({ id }) => {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="form-input">
+            <label htmlFor="date">Date</label>
+            <input
+              type="date"
+              id="date"
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              required
+            />
           </div>
           <div className="form-input">
             <label htmlFor="payee">Payee</label>
