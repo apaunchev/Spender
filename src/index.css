@@ -255,6 +255,10 @@ main > section:last-child {
   .table td:last-child {
     border-bottom: 0;
   }
+
+  .table tfoot {
+    border-top: none;
+  }
 }
 
 /* Color pill */
@@ -379,7 +383,7 @@ input[type="submit"],
   border-radius: 0;
   border-bottom: 2px solid var(--border);
   font: inherit;
-  -webkit-appearance: none;
+  -webkit-appearance: caret;
 }
 
 .form-input select:focus,
@@ -420,23 +424,23 @@ input[type="submit"],
 }
 
 .tal {
-  text-align: left;
+  text-align: left !important;
 }
 
 .tar {
-  text-align: right;
+  text-align: right !important;
 }
 
 .tac {
-  text-align: center;
+  text-align: center !important;
 }
 
 .jumbo {
-  font-size: 125%;
+  font-size: 125% !important;
 }
 
 .bold {
-  font-weight: bold;
+  font-weight: bold !important;
 }
 
 .flex {

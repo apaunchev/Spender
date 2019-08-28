@@ -25,6 +25,8 @@ const Expenses = () => {
   // Local storage
   const [expenses] = useLocalStorage("expenses", []);
   const [budgets] = useLocalStorage("budgets", []);
+  const [settings] = useLocalStorage("settings", []);
+  const currency = settings.currency || "EUR";
 
   // State
   const [loading, setLoading] = useState(true);
@@ -203,13 +205,26 @@ const Expenses = () => {
                           </td>
                           <td data-label="Payee">{payee || "–"}</td>
                           <td data-label="Amount" className="tar">
-                            {formatAmountInCurrency(amount)}
+                            {formatAmountInCurrency(amount, currency)}
                           </td>
                         </tr>
                       );
                     }
                   )}
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <th colSpan="3" className="tar">
+                      Total
+                    </th>
+                    <td data-label="Total" className="tar bold">
+                      {formatAmountInCurrency(
+                        getTotalAmountFromArray(formattedExpenses),
+                        currency
+                      )}
+                    </td>
+                  </tr>
+                </tfoot>
               </table>
             </>
           ) : (

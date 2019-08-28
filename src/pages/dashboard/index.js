@@ -196,7 +196,7 @@ const Dashboard = () => {
             </tbody>
             <tfoot>
               <tr>
-                <th>Total</th>
+                <th className="tar">Total</th>
                 <td data-label="Total planned" className="tar bold">
                   {formatAmountInCurrency(totalPlanned, currency)}
                 </td>
