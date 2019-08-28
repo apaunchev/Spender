@@ -62,7 +62,7 @@ const Expense = ({ id }) => {
       );
     }
 
-    navigate("/dashboard");
+    navigate("/expenses");
   };
 
   const onDelete = (e, id) => {
