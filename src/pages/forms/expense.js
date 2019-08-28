@@ -105,7 +105,7 @@ const Expense = ({ id }) => {
               required
             >
               <option value="" disabled hidden>
-                Select budget
+                Select a budget...
               </option>
               {budgets.map(({ id, name }) => (
                 <option key={id} value={id}>
@@ -139,7 +139,6 @@ const Expense = ({ id }) => {
             <input
               type="text"
               id="notes"
-              placeholder="Discounted by 20%"
               value={notes}
               onChange={e => setNotes(e.target.value)}
             />
