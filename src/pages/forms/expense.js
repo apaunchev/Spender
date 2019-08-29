@@ -79,7 +79,7 @@ const Expense = ({ id }) => {
     <>
       <Header />
       <main>
-        <h2>New expense</h2>
+        <h2>{!id ? "New" : "Edit"} expense</h2>
         <form className="form" onSubmit={onSubmit}>
           <div className="form-input">
             <label htmlFor="amount">Amount</label>

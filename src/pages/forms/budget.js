@@ -63,7 +63,7 @@ const Budget = ({ id }) => {
     <>
       <Header />
       <main>
-        <h2>New budget</h2>
+        <h2>{!id ? "New" : "Edit"} budget</h2>
         <form className="form" onSubmit={onSubmit}>
           <div className="form-input">
             <label htmlFor="name">Name</label>
