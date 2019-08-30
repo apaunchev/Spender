@@ -9,6 +9,7 @@ import { endOfMonth } from "date-fns/esm";
 import { A } from "hookrouter";
 import React, { useState, useEffect } from "react";
 import Bar from "../../components/bar";
+import Blankslate from "../../components/blankslate";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
@@ -136,81 +137,93 @@ const Dashboard = () => {
               </button>
             </nav>
           </header>
-          <Bar data={budgets} />
-          <table className="table">
-            <thead>
-              <tr>
-                <th width="100%">
-                  <a href="/dashboard" onClick={e => onSort(e, "name")}>
-                    Name
-                  </a>
-                </th>
-                <th className="tar">
-                  <a href="/dashboard" onClick={e => onSort(e, "amount", true)}>
-                    Planned
-                  </a>
-                </th>
-                <th className="tar">Current</th>
-              </tr>
-            </thead>
-            <tbody>
-              {formattedBudgets.map(({ id, name, amount, color }) => {
-                const currentForBudget = getMTDForBudget(id);
-                const currentAsPercent = formatAmountInPercent(
-                  (currentForBudget / amount) * 100,
-                  0
-                );
-                let warningOrDangerClass = "";
-                if (currentForBudget > amount * 0.7) {
-                  warningOrDangerClass = "warning";
-                }
-                if (currentForBudget > amount) {
-                  warningOrDangerClass = "danger";
-                }
+          {budgets.length ? (
+            <>
+              <Bar data={budgets} />
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th width="100%">
+                      <a href="/dashboard" onClick={e => onSort(e, "name")}>
+                        Name
+                      </a>
+                    </th>
+                    <th className="tar">
+                      <a
+                        href="/dashboard"
+                        onClick={e => onSort(e, "amount", true)}
+                      >
+                        Planned
+                      </a>
+                    </th>
+                    <th className="tar">Current</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formattedBudgets.map(({ id, name, amount, color }) => {
+                    const currentForBudget = getMTDForBudget(id);
+                    const currentAsPercent = formatAmountInPercent(
+                      (currentForBudget / amount) * 100,
+                      0
+                    );
+                    let warningOrDangerClass = "";
+                    if (currentForBudget > amount * 0.7) {
+                      warningOrDangerClass = "warning";
+                    }
+                    if (currentForBudget > amount) {
+                      warningOrDangerClass = "danger";
+                    }
 
-                return (
-                  <tr key={id}>
-                    <td data-label="Name">
-                      <span
-                        className="color-pill"
-                        style={{ backgroundColor: color }}
-                      />
-                      <A href={`/budget/${id}`}>{name}</A>
-                    </td>
-                    <td data-label="Amount" className="tar">
-                      {formatAmountInCurrency(amount, currency)}
+                    return (
+                      <tr key={id}>
+                        <td data-label="Name">
+                          <span
+                            className="color-pill"
+                            style={{ backgroundColor: color }}
+                          />
+                          <A href={`/budget/${id}`}>{name}</A>
+                        </td>
+                        <td data-label="Amount" className="tar">
+                          {formatAmountInCurrency(amount, currency)}
+                        </td>
+                        <td
+                          data-label="Current"
+                          className={`tar ${warningOrDangerClass}`}
+                          title={currentAsPercent}
+                        >
+                          {formatAmountInCurrency(currentForBudget, currency)}{" "}
+                          <small className="small-screen-only">
+                            ({currentAsPercent})
+                          </small>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th className="tar">Total</th>
+                    <td data-label="Total planned" className="tar bold">
+                      {formatAmountInCurrency(totalPlanned, currency)}
                     </td>
                     <td
-                      data-label="Current"
-                      className={`tar ${warningOrDangerClass}`}
-                      title={currentAsPercent}
+                      data-label="Total current"
+                      className={`tar bold ${
+                        totalCurrent > totalPlanned ? "danger" : ""
+                      }`}
                     >
-                      {formatAmountInCurrency(currentForBudget, currency)}{" "}
-                      <small className="small-screen-only">
-                        ({currentAsPercent})
-                      </small>
+                      {formatAmountInCurrency(totalCurrent, currency)}
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
-            <tfoot>
-              <tr>
-                <th className="tar">Total</th>
-                <td data-label="Total planned" className="tar bold">
-                  {formatAmountInCurrency(totalPlanned, currency)}
-                </td>
-                <td
-                  data-label="Total current"
-                  className={`tar bold ${
-                    totalCurrent > totalPlanned ? "danger" : ""
-                  }`}
-                >
-                  {formatAmountInCurrency(totalCurrent, currency)}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+                </tfoot>
+              </table>
+            </>
+          ) : (
+            <Blankslate
+              title="Nothing to show"
+              description="Looks like there are no categories to show here yet."
+            />
+          )}
         </div>
       </main>
       <Footer />
