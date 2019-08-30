@@ -11,7 +11,9 @@ const routes = {
   "/expenses": () => <Expenses />,
   "/new/expense": () => <Expense />,
   "/expense/:id": ({ id }) => <Expense id={id} />,
-  "/new/budget": () => <Budget />,
+  "/new/budget/:year/:month": ({ year, month }) => (
+    <Budget year={year} month={month} />
+  ),
   "/budget/:id": ({ id }) => <Budget id={id} />,
   "/settings": () => <Settings />
 };

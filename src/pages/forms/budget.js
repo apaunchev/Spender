@@ -1,3 +1,4 @@
+import { format, subMonths, addMonths, parseISO } from "date-fns";
 import { navigate } from "hookrouter";
 import React, { useState, useEffect } from "react";
 import { CirclePicker } from "react-color";
@@ -7,11 +8,12 @@ import { BUDGET_NAMES } from "../../datalists";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { ID, renderDatalistFromArray } from "../../utils";
 
-const Budget = ({ id }) => {
+const Budget = ({ id, year, month }) => {
   // Local storage
   const [budgets, setBudgets] = useLocalStorage("budgets", []);
 
   // State
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [color, setColor] = useState("#000000");
@@ -19,32 +21,48 @@ const Budget = ({ id }) => {
   // Effects
   useEffect(() => {
     if (id) {
-      const { name, amount, color } = budgets.find(b => b.id === id) || {};
+      const { date, name, amount, color } =
+        budgets.find(b => b.id === id) || {};
 
       if (!name) {
         navigate("/dashboard");
       }
 
+      setCurrentDate(parseISO(date));
       setName(name);
       setAmount(amount);
       setColor(color);
     }
-  }, [id, budgets]);
+
+    if (year && month) {
+      setCurrentDate(new Date(year, month, 1));
+    }
+  }, [id, year, month, budgets]);
 
   // Events
   const onSubmit = e => {
     e.preventDefault();
 
-    setBudgets([
-      ...budgets,
-      {
-        id: ID(),
-        date: new Date(),
-        name,
-        amount,
-        color
-      }
-    ]);
+    if (!id) {
+      // create
+      setBudgets([
+        ...budgets,
+        {
+          id: ID(),
+          date: format(currentDate, "yyyy-MM-dd"),
+          name,
+          amount,
+          color
+        }
+      ]);
+    } else {
+      // update
+      setBudgets(
+        budgets.map(b =>
+          b.id === id ? { id, date: currentDate, name, amount, color } : b
+        )
+      );
+    }
 
     navigate("/dashboard");
   };
@@ -62,8 +80,35 @@ const Budget = ({ id }) => {
   return (
     <>
       <Header />
+      <header className="mb3 flex flex--between">
+        <div>
+          <h2>{!id ? "New" : "Edit"} budget</h2>
+        </div>
+        <nav className="button-group">
+          <button
+            className="button"
+            onClick={() => setCurrentDate(subMonths(currentDate, 1))}
+            title="Jump to previous month"
+          >
+            &larr;
+          </button>
+          <button
+            className="button"
+            onClick={() => setCurrentDate(new Date())}
+            title="Jump to current month"
+          >
+            {format(currentDate, "MMM yyyy")}
+          </button>
+          <button
+            className="button"
+            onClick={() => setCurrentDate(addMonths(currentDate, 1))}
+            title="Jump to next month"
+          >
+            &rarr;
+          </button>
+        </nav>
+      </header>
       <main>
-        <h2>{!id ? "New" : "Edit"} budget</h2>
         <form className="form" onSubmit={onSubmit}>
           <div className="form-input">
             <label htmlFor="name">Name</label>

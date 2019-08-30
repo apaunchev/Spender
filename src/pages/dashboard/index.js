@@ -3,7 +3,9 @@ import {
   format,
   isWithinInterval,
   startOfMonth,
-  subMonths
+  subMonths,
+  getMonth,
+  getYear
 } from "date-fns";
 import { endOfMonth } from "date-fns/esm";
 import { A } from "hookrouter";
@@ -35,6 +37,15 @@ const Dashboard = () => {
 
   // Effects
   useEffect(() => {
+    setFormattedBudgets(
+      budgets.filter(b =>
+        isWithinInterval(new Date(b.date), {
+          start: startOfMonth(new Date(currentDate)),
+          end: endOfMonth(new Date(currentDate))
+        })
+      )
+    );
+
     setFormattedExpenses(
       expenses.filter(e =>
         isWithinInterval(new Date(e.date), {
@@ -45,7 +56,7 @@ const Dashboard = () => {
     );
 
     setLoading(false);
-  }, [expenses, currentDate]);
+  }, [budgets, expenses, currentDate]);
 
   // Events
   const onSort = (e, field, desc) => {
@@ -93,7 +104,7 @@ const Dashboard = () => {
     return getTotalAmountFromArray(expensesForBudget);
   };
 
-  const totalPlanned = getTotalAmountFromArray(budgets);
+  const totalPlanned = getTotalAmountFromArray(formattedBudgets);
 
   const totalCurrent = getTotalAmountFromArray(formattedExpenses);
 
@@ -105,13 +116,23 @@ const Dashboard = () => {
     <>
       <Header />
       <main>
-        {renderBalanceMessage(totalPlanned - totalCurrent, currency, budgets)}
+        {renderBalanceMessage(
+          totalPlanned - totalCurrent,
+          currency,
+          formattedBudgets
+        )}
         <hr />
         <div>
           <header className="mb3 flex flex--between">
             <div>
               <h2 className="mb0">Budgets</h2>
-              <A href="/new/budget">New budget</A>
+              <A
+                href={`/new/budget/${getYear(currentDate)}/${getMonth(
+                  currentDate
+                )}`}
+              >
+                New budget
+              </A>
             </div>
             <nav className="button-group">
               <button
@@ -137,9 +158,9 @@ const Dashboard = () => {
               </button>
             </nav>
           </header>
-          {budgets.length ? (
+          {formattedBudgets.length ? (
             <>
-              <Bar data={budgets} />
+              <Bar data={formattedBudgets} />
               <table className="table">
                 <thead>
                   <tr>
