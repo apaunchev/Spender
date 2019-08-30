@@ -229,7 +229,7 @@ const Expenses = () => {
             </>
           ) : (
             <Blankslate
-              title="Nothing found"
+              title="Nothing to show"
               description="Looks like there are no expenses to show here yet."
             />
           )}
