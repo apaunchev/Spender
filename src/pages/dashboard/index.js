@@ -134,6 +134,12 @@ const Dashboard = () => {
               >
                 New budget
               </A>
+              {" / "}
+              <A
+                href={`/clone/${getYear(currentDate)}/${getMonth(currentDate)}`}
+              >
+                Clone budgets
+              </A>
             </div>
             <nav className="button-group">
               <button

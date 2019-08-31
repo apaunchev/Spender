@@ -1,4 +1,5 @@
 import React from "react";
+import Clone from "./pages/clone";
 import Intro from "./pages/intro";
 import Dashboard from "./pages/dashboard";
 import Expenses from "./pages/expenses";
@@ -15,6 +16,9 @@ const routes = {
     <Budget year={year} month={month} />
   ),
   "/budget/:id": ({ id }) => <Budget id={id} />,
+  "/clone/:year/:month": ({ year, month }) => (
+    <Clone year={year} month={month} />
+  ),
   "/settings": () => <Settings />
 };
 
