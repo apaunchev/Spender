@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { CirclePicker } from "react-color";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
-import { BUDGET_NAMES } from "../../datalists";
+import { BUDGET_NAMES } from "../../consts";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { ID, renderDatalistFromArray } from "../../utils";
 import { DATE_FORMAT_ISO, DATE_FORMAT_HUMAN_SHORT } from "../../consts";

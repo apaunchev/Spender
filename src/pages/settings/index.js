@@ -2,7 +2,7 @@ import { navigate } from "hookrouter";
 import React, { useState } from "react";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
-import { CURRENCIES } from "../../datalists";
+import { CURRENCIES } from "../../consts";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { LOCAL_STORAGE_PREFIX } from "../../consts";
 
