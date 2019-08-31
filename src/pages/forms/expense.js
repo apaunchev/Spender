@@ -139,6 +139,7 @@ const Expense = ({ id }) => {
             <input
               type="text"
               id="notes"
+              placeholder="Purchased with debit card"
               value={notes}
               onChange={e => setNotes(e.target.value)}
             />
