@@ -63,15 +63,6 @@ const Dashboard = () => {
 
     return (
       <div className="chart">
-        <div className="bar" style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}>
-          <span
-            className="bar__segment"
-            style={{
-              backgroundColor: "#54a0e8",
-              width: `${(totalCurrent / totalPlanned) * 100}%`
-            }}
-          ></span>
-        </div>
         <ol className="legend">
           <li>
             <span
@@ -99,6 +90,15 @@ const Dashboard = () => {
             </span>
           </li>
         </ol>
+        <div className="bar" style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}>
+          <span
+            className="bar__segment"
+            style={{
+              backgroundColor: "#54a0e8",
+              width: `${(totalCurrent / totalPlanned) * 100}%`
+            }}
+          ></span>
+        </div>
       </div>
     );
   };
@@ -128,20 +128,6 @@ const Dashboard = () => {
 
     return (
       <div className="chart">
-        <div className="bar">
-          {final.map(({ color, amount }, idx) => (
-            <span
-              key={`g-${idx}`}
-              className="bar__segment"
-              style={{
-                backgroundColor: color,
-                width: `${(amount /
-                  getTotalAmountFromArray(formattedExpenses)) *
-                  100}%`
-              }}
-            />
-          ))}
-        </div>
         <ol className="legend">
           {final.map(({ name, color, amount }, idx) => (
             <li key={`g-${idx}`}>
@@ -164,6 +150,20 @@ const Dashboard = () => {
             </li>
           ))}
         </ol>
+        <div className="bar">
+          {final.map(({ color, amount }, idx) => (
+            <span
+              key={`g-${idx}`}
+              className="bar__segment"
+              style={{
+                backgroundColor: color,
+                width: `${(amount /
+                  getTotalAmountFromArray(formattedExpenses)) *
+                  100}%`
+              }}
+            />
+          ))}
+        </div>
       </div>
     );
   };
