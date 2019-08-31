@@ -231,13 +231,12 @@ const Dashboard = () => {
     <>
       <Header />
       <main>
-        <header className="flex flex--between">
+        <header>
           <h1 className="mb0">Budgets</h1>
           <A
             href={`/new/budget/${getYear(currentDate)}/${getMonth(
               currentDate
             )}`}
-            className="button button--primary"
           >
             New budget
           </A>
@@ -250,11 +249,9 @@ const Dashboard = () => {
           <h1>Categories</h1>
           {renderCategories()}
         </section>
-        <header className="flex flex--between">
+        <header>
           <h1 className="mb0">Expenses</h1>
-          <A href="/new/expense" className="button button--primary">
-            New expense
-          </A>
+          <A href="/new/expense">New expense</A>
         </header>
         <section>{renderExpenses()}</section>
       </main>
