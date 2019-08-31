@@ -12,6 +12,7 @@ import { DATE_FORMAT_ISO, DATE_FORMAT_HUMAN_SHORT } from "../../consts";
 const Budget = ({ id, year, month }) => {
   // Local storage
   const [budgets, setBudgets] = useLocalStorage("budgets", []);
+  const [expenses, setExpenses] = useLocalStorage("expenses", []);
 
   // State
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -70,9 +71,13 @@ const Budget = ({ id, year, month }) => {
 
   const onDelete = (e, id) => {
     e.preventDefault();
-
-    if (window.confirm("Are you sure you want to delete this budget?")) {
+    if (
+      window.confirm(
+        "Deleting this budget will also delete all expenses linked to it. Proceed?"
+      )
+    ) {
       setBudgets(budgets.filter(b => b.id !== id));
+      setExpenses(expenses.filter(e => e.budget !== id));
 
       navigate("/dashboard");
     }
