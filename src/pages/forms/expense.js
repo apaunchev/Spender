@@ -13,6 +13,7 @@ import Footer from "../../components/footer";
 import Header from "../../components/header";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { ID, toDateInputValue } from "../../utils";
+import { DATE_FORMAT_ISO } from "../../consts";
 
 const Expense = ({ id }) => {
   // Local storage
@@ -39,7 +40,7 @@ const Expense = ({ id }) => {
 
       setAmount(amount);
       setBudget(budget);
-      setDate(format(new Date(date), "yyyy-MM-dd"));
+      setDate(format(new Date(date), DATE_FORMAT_ISO));
       setPayee(payee);
       setNotes(notes);
     }

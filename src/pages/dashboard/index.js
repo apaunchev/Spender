@@ -21,6 +21,7 @@ import {
   compareBy,
   formatAmountInPercent
 } from "../../utils";
+import { DATE_FORMAT_HUMAN_SHORT } from "../../consts";
 
 const Dashboard = () => {
   // Local storage
@@ -147,7 +148,7 @@ const Dashboard = () => {
                 onClick={() => setCurrentDate(new Date())}
                 title="Jump to current month"
               >
-                {format(currentDate, "MMM yyyy")}
+                {format(currentDate, DATE_FORMAT_HUMAN_SHORT)}
               </button>
               <button
                 className="button"

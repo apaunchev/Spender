@@ -7,6 +7,7 @@ import Header from "../../components/header";
 import { BUDGET_NAMES } from "../../datalists";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { ID, renderDatalistFromArray } from "../../utils";
+import { DATE_FORMAT_ISO, DATE_FORMAT_HUMAN_SHORT } from "../../consts";
 
 const Budget = ({ id, year, month }) => {
   // Local storage
@@ -49,7 +50,7 @@ const Budget = ({ id, year, month }) => {
         ...budgets,
         {
           id: ID(),
-          date: format(currentDate, "yyyy-MM-dd"),
+          date: format(currentDate, DATE_FORMAT_ISO),
           name,
           amount,
           color
@@ -97,7 +98,7 @@ const Budget = ({ id, year, month }) => {
             onClick={() => setCurrentDate(new Date())}
             title="Jump to current month"
           >
-            {format(currentDate, "MMM yyyy")}
+            {format(currentDate, DATE_FORMAT_HUMAN_SHORT)}
           </button>
           <button
             className="button"

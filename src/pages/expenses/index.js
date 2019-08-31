@@ -20,6 +20,7 @@ import {
   groupBy,
   sumOfObjectValues
 } from "../../utils";
+import { DATE_FORMAT_HUMAN_SHORT } from "../../consts";
 
 const Expenses = () => {
   // Local storage
@@ -137,7 +138,7 @@ const Expenses = () => {
                 onClick={() => setCurrentDate(new Date())}
                 title="Jump to current month"
               >
-                {format(currentDate, "MMM yyyy")}
+                {format(currentDate, DATE_FORMAT_HUMAN_SHORT)}
               </button>
               <button
                 className="button"
