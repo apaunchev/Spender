@@ -2,6 +2,7 @@ import React from "react";
 import Clone from "./pages/clone";
 import Intro from "./pages/intro";
 import Dashboard from "./pages/dashboard";
+import Budgets from "./pages/budgets";
 import Expenses from "./pages/expenses";
 import { Expense, Budget } from "./pages/forms";
 import Settings from "./pages/settings";
@@ -9,6 +10,7 @@ import Settings from "./pages/settings";
 const routes = {
   "/": () => <Intro />,
   "/dashboard": () => <Dashboard />,
+  "/budgets": () => <Budgets />,
   "/expenses": () => <Expenses />,
   "/expenses/:budgetId": ({ budgetId }) => <Expenses budgetId={budgetId} />,
   "/new/expense": () => <Expense />,

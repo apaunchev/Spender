@@ -123,131 +123,126 @@ const Expenses = ({ budgetId }) => {
     <>
       <Header />
       <main>
-        <div>
-          <header className="mb3 flex flex--between">
-            <div>
-              <h2 className="mb0">Expenses</h2>
-              <A href="/new/expense">New expense</A>
-            </div>
-            <nav className="button-group">
-              <button
-                className="button"
-                onClick={() => setCurrentDate(subMonths(currentDate, 1))}
-                title="Jump to previous month"
-              >
-                &larr;
-              </button>
-              <button
-                className="button"
-                onClick={() => setCurrentDate(new Date())}
-                title="Jump to current month"
-              >
-                {format(currentDate, DATE_FORMAT_HUMAN_SHORT)}
-              </button>
-              <button
-                className="button"
-                onClick={() => setCurrentDate(addMonths(currentDate, 1))}
-                title="Jump to next month"
-              >
-                &rarr;
-              </button>
-            </nav>
-          </header>
-          {!loading && formattedExpenses.length ? (
-            <>
-              {budgetId ? (
-                <p className="italic">
-                  Showing expenses from the{" "}
-                  <strong>{getBudgetName(budgetId)}</strong> budget.{" "}
-                  <A href="/expenses" title="Clear filter">
-                    ×
-                  </A>
-                </p>
-              ) : null}
-              {renderBar(formattedExpenses, budgets)}
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>
-                      <a
-                        href="/dashboard"
-                        onClick={e => onSort(e, "date", true)}
-                      >
-                        Date
-                      </a>
-                    </th>
-                    <th>
-                      <a href="/dashboard" onClick={e => onSort(e, "budget")}>
-                        Budget
-                      </a>
-                    </th>
-                    <th>
-                      <a href="/dashboard" onClick={e => onSort(e, "payee")}>
-                        Payee
-                      </a>
-                    </th>
-                    <th className="tar">
-                      <a
-                        href="/dashboard"
-                        onClick={e => onSort(e, "amount", true)}
-                      >
-                        Amount
-                      </a>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {formattedExpenses.map(
-                    ({ id, date, amount, budget, payee }) => {
-                      const b = budgets.find(b => b.id === budget) || {};
+        <header className="mb3 flex flex--between">
+          <div>
+            <h2 className="mb0">Expenses</h2>
+            <A href="/new/expense">New expense</A>
+          </div>
+          <nav className="button-group">
+            <button
+              className="button"
+              onClick={() => setCurrentDate(subMonths(currentDate, 1))}
+              title="Jump to previous month"
+            >
+              &larr;
+            </button>
+            <button
+              className="button"
+              onClick={() => setCurrentDate(new Date())}
+              title="Jump to current month"
+            >
+              {format(currentDate, DATE_FORMAT_HUMAN_SHORT)}
+            </button>
+            <button
+              className="button"
+              onClick={() => setCurrentDate(addMonths(currentDate, 1))}
+              title="Jump to next month"
+            >
+              &rarr;
+            </button>
+          </nav>
+        </header>
+        {!loading && formattedExpenses.length ? (
+          <>
+            {budgetId ? (
+              <p className="italic">
+                Showing expenses from the{" "}
+                <strong>{getBudgetName(budgetId)}</strong> budget.{" "}
+                <A href="/expenses" title="Clear filter">
+                  ×
+                </A>
+              </p>
+            ) : null}
+            {renderBar(formattedExpenses, budgets)}
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>
+                    <a href="/dashboard" onClick={e => onSort(e, "date", true)}>
+                      Date
+                    </a>
+                  </th>
+                  <th>
+                    <a href="/dashboard" onClick={e => onSort(e, "budget")}>
+                      Budget
+                    </a>
+                  </th>
+                  <th>
+                    <a href="/dashboard" onClick={e => onSort(e, "payee")}>
+                      Payee
+                    </a>
+                  </th>
+                  <th className="tar">
+                    <a
+                      href="/dashboard"
+                      onClick={e => onSort(e, "amount", true)}
+                    >
+                      Amount
+                    </a>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {formattedExpenses.map(
+                  ({ id, date, amount, budget, payee }) => {
+                    const b = budgets.find(b => b.id === budget) || {};
 
-                      return (
-                        <tr key={id}>
-                          <td data-label="Date">
-                            <A href={`/expense/${id}`}>
-                              {new Date(date).toLocaleDateString()}
-                            </A>
-                          </td>
-                          <td data-label="Budget">
-                            <span
-                              className="color-pill"
-                              style={{
-                                backgroundColor: b.color || "#212121"
-                              }}
-                            />
-                            <A href={`/expenses/${b.id}`}>{b.name}</A>
-                          </td>
-                          <td data-label="Payee">{payee || "–"}</td>
-                          <td data-label="Amount" className="tar">
-                            {formatAmountInCurrency(amount, currency)}
-                          </td>
-                        </tr>
-                      );
-                    }
-                  )}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th colSpan="3" className="tar">
-                      Total
-                    </th>
-                    <td data-label="Total" className="tar bold">
-                      {formatAmountInCurrency(
-                        getTotalAmountFromArray(formattedExpenses),
-                        currency
-                      )}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </>
-          ) : (
-            <Blankslate
-              title="Nothing to show"
-              description="Looks like there are no expenses to show here yet."
-            />
-          )}
-        </div>
+                    return (
+                      <tr key={id}>
+                        <td data-label="Date">
+                          <A href={`/expense/${id}`}>
+                            {new Date(date).toLocaleDateString()}
+                          </A>
+                        </td>
+                        <td data-label="Budget">
+                          <span
+                            className="color-pill"
+                            style={{
+                              backgroundColor: b.color || "#212121"
+                            }}
+                          />
+                          <A href={`/expenses/${b.id}`}>{b.name}</A>
+                        </td>
+                        <td data-label="Payee">{payee || "–"}</td>
+                        <td data-label="Amount" className="tar">
+                          {formatAmountInCurrency(amount, currency)}
+                        </td>
+                      </tr>
+                    );
+                  }
+                )}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colSpan="3" className="tar">
+                    Total
+                  </th>
+                  <td data-label="Total" className="tar bold">
+                    {formatAmountInCurrency(
+                      getTotalAmountFromArray(formattedExpenses),
+                      currency
+                    )}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </>
+        ) : (
+          <Blankslate
+            title="Nothing to show"
+            description="Looks like there are no expenses to show here yet."
+          />
+        )}
       </main>
       <Footer />
     </>
