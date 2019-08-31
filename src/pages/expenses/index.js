@@ -22,7 +22,7 @@ import {
 } from "../../utils";
 import { DATE_FORMAT_HUMAN_SHORT } from "../../consts";
 
-const Expenses = () => {
+const Expenses = ({ budgetId }) => {
   // Local storage
   const [expenses] = useLocalStorage("expenses", []);
   const [budgets] = useLocalStorage("budgets", []);
@@ -44,11 +44,12 @@ const Expenses = () => {
             end: endOfMonth(new Date(currentDate))
           })
         )
+        .filter(e => (budgetId ? e.budget === budgetId : true))
         .sort(compareBy("date", true))
     );
 
     setLoading(false);
-  }, [expenses, currentDate]);
+  }, [budgetId, expenses, currentDate]);
 
   // Events
   const onSort = (e, field, desc) => {
@@ -115,6 +116,9 @@ const Expenses = () => {
     );
   };
 
+  const getBudgetName = budgetId =>
+    (budgets.find(b => b.id === budgetId) || {}).name;
+
   return (
     <>
       <Header />
@@ -151,6 +155,15 @@ const Expenses = () => {
           </header>
           {!loading && formattedExpenses.length ? (
             <>
+              {budgetId ? (
+                <p className="italic">
+                  Showing expenses from the{" "}
+                  <strong>{getBudgetName(budgetId)}</strong> budget.{" "}
+                  <A href="/expenses" title="Clear filter">
+                    ×
+                  </A>
+                </p>
+              ) : null}
               {renderBar(formattedExpenses, budgets)}
               <table className="table">
                 <thead>
@@ -202,7 +215,7 @@ const Expenses = () => {
                                 backgroundColor: b.color || "#212121"
                               }}
                             />
-                            {b.name}
+                            <A href={`/expenses/${b.id}`}>{b.name}</A>
                           </td>
                           <td data-label="Payee">{payee || "–"}</td>
                           <td data-label="Amount" className="tar">

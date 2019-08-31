@@ -10,6 +10,7 @@ const routes = {
   "/": () => <Intro />,
   "/dashboard": () => <Dashboard />,
   "/expenses": () => <Expenses />,
+  "/expenses/:budgetId": ({ budgetId }) => <Expenses budgetId={budgetId} />,
   "/new/expense": () => <Expense />,
   "/expense/:id": ({ id }) => <Expense id={id} />,
   "/new/budget/:year/:month": ({ year, month }) => (
