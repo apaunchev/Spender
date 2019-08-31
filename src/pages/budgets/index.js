@@ -89,7 +89,7 @@ const Dashboard = () => {
       <main>
         <header className="mb3 flex flex--between">
           <div>
-            <h2 className="mb0">Budgets</h2>
+            <h1 className="mb0">Budgets</h1>
             <A
               href={`/new/budget/${getYear(currentDate)}/${getMonth(
                 currentDate

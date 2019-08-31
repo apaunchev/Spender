@@ -118,7 +118,7 @@ const Expenses = ({ budgetId }) => {
       <main>
         <header className="mb3 flex flex--between">
           <div>
-            <h2 className="mb0">Expenses</h2>
+            <h1 className="mb0">Expenses</h1>
             <A href="/new/expense">New expense</A>
           </div>
           <MonthNav currentDate={currentDate} setCurrentDate={setCurrentDate} />

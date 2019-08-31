@@ -65,7 +65,7 @@ const Clone = ({ year, month }) => {
     <>
       <Header />
       <main>
-        <h2>Clone budgets</h2>
+        <h1>Clone budgets</h1>
         <p>
           This operation will clone the budgets from the selected month into{" "}
           <strong>{format(currentDate, DATE_FORMAT_HUMAN)}</strong>.

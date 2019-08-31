@@ -87,9 +87,7 @@ const Budget = ({ id, year, month }) => {
     <>
       <Header />
       <header className="mb3 flex flex--between">
-        <div>
-          <h2>{!id ? "New" : "Edit"} budget</h2>
-        </div>
+        <h1 className="mb0">{!id ? "New" : "Edit"} budget</h1>
         <MonthNav currentDate={currentDate} setCurrentDate={setCurrentDate} />
       </header>
       <main>

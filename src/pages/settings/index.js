@@ -48,7 +48,7 @@ const Settings = () => {
     <>
       <Header />
       <main>
-        <h2>Settings</h2>
+        <h1>Settings</h1>
         <form className="form" onSubmit={onSubmit}>
           <div className="form-input">
             <label htmlFor="currency">Currency</label>
@@ -72,11 +72,11 @@ const Settings = () => {
               value="Save"
             />
           </div>
-          <h3>Stored data</h3>
+          <h2>Stored data</h2>
           <p>
             Currently you have <strong>{budgets.length || 0} budgets</strong>{" "}
             and <strong>{expenses.length || 0} expenses</strong> stored on your
-            device, along with the settings from this page.
+            device.
           </p>
           <p className="danger">
             <a href="/" onClick={e => onDelete(e)}>
