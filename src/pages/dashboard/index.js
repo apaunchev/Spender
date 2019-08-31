@@ -1,5 +1,12 @@
-import { endOfMonth, isWithinInterval, startOfMonth } from "date-fns";
+import {
+  endOfMonth,
+  getMonth,
+  getYear,
+  isWithinInterval,
+  startOfMonth
+} from "date-fns";
 import { A } from "hookrouter";
+import { chain, reduce } from "lodash";
 import React, { useEffect, useState } from "react";
 import Blankslate from "../../components/blankslate";
 import Footer from "../../components/footer";
@@ -8,6 +15,7 @@ import { useLocalStorage } from "../../hooks/useLocalStorage";
 import {
   compareBy,
   formatAmountInCurrency,
+  formatAmountInPercent,
   getTotalAmountFromArray
 } from "../../utils";
 
@@ -48,31 +56,172 @@ const Dashboard = () => {
   }, [budgets, expenses, currentDate]);
 
   // Helpers
-  const renderBalanceMessage = (amount, currency, budgets) => {
-    const RISK_THRESHOLD = 0.3;
-    const formattedAmount = formatAmountInCurrency(amount, currency);
-    const totalBudgets = getTotalAmountFromArray(budgets);
-
-    let className;
-    if (amount <= 0) {
-      className = "balance balance--dangerous";
-    } else if (amount > 0 && amount <= totalBudgets * RISK_THRESHOLD) {
-      className = "balance balance--risky";
-    } else {
-      className = "balance balance--safe";
-    }
+  const renderOverview = () => {
+    const totalPlanned = getTotalAmountFromArray(formattedBudgets);
+    const totalCurrent = getTotalAmountFromArray(formattedExpenses);
+    const totalLeft = totalPlanned - totalCurrent;
 
     return (
-      <h1>
-        You have <span className={className}>{formattedAmount}</span> left to
-        spend or save this month.
-      </h1>
+      <>
+        <div className="bar" style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}>
+          <span
+            className="bar__segment"
+            style={{
+              backgroundColor: "#54a0e8",
+              width: `${(totalCurrent / totalPlanned) * 100}%`
+            }}
+          ></span>
+        </div>
+        <ol className="legend">
+          <li>
+            <span
+              className="color-pill"
+              style={{ backgroundColor: "#54a0e8" }}
+            />
+            <span>
+              Spent - {formatAmountInCurrency(totalCurrent, currency)}{" "}
+              <small>
+                ({formatAmountInPercent((totalCurrent / totalPlanned) * 100)})
+              </small>
+            </span>
+          </li>
+          <li>
+            <span
+              className="color-pill"
+              style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}
+            />
+            <span>
+              Left to spend or save -{" "}
+              <mark>{formatAmountInCurrency(totalLeft, currency)}</mark>{" "}
+              <small>
+                ({formatAmountInPercent((totalLeft / totalPlanned) * 100)})
+              </small>
+            </span>
+          </li>
+        </ol>
+      </>
     );
   };
 
-  const totalPlanned = getTotalAmountFromArray(formattedBudgets);
+  const renderCategories = () => {
+    const formatted = chain(formattedExpenses)
+      .map(e => ({
+        ...e,
+        budget: (budgets.find(b => b.id === e.budget) || {}).name || ""
+      }))
+      .groupBy("budget")
+      .map((b, k) => ({
+        name: k,
+        color: (budgets.find(b => b.name === k) || {}).color || "#000",
+        amount: reduce(b, (prev, curr) => prev + curr.amount, 0)
+      }))
+      .sortBy(b => -b.amount)
+      .value();
+    const final = [
+      ...formatted.slice(0, 5),
+      {
+        id: "_others",
+        name: "Others",
+        amount: getTotalAmountFromArray(formatted.slice(5))
+      }
+    ];
 
-  const totalCurrent = getTotalAmountFromArray(formattedExpenses);
+    return (
+      <>
+        <div className="bar">
+          {final.map(({ color, amount }, idx) => (
+            <span
+              key={`g-${idx}`}
+              className="bar__segment"
+              style={{
+                backgroundColor: color,
+                width: `${(amount /
+                  getTotalAmountFromArray(formattedExpenses)) *
+                  100}%`
+              }}
+            />
+          ))}
+        </div>
+        <ol className="legend">
+          {final.map(({ name, color, amount }, idx) => (
+            <li key={`g-${idx}`}>
+              <span
+                className="color-pill"
+                style={{
+                  backgroundColor: color || "#212121"
+                }}
+              />
+              <span>
+                {name} - {formatAmountInCurrency(amount, currency)}{" "}
+                <small>
+                  (
+                  {formatAmountInPercent(
+                    (amount / getTotalAmountFromArray(formattedExpenses)) * 100
+                  )}
+                  )
+                </small>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </>
+    );
+  };
+
+  const renderExpenses = () => {
+    if (!formattedExpenses.length) {
+      return (
+        <Blankslate
+          title="Nothing to show"
+          description="Looks like there are no expenses to show here yet."
+        />
+      );
+    }
+
+    return (
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Budget</th>
+            <th>Payee</th>
+            <th className="tar">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {formattedExpenses
+            .sort(compareBy("date", true))
+            .slice(0, 10)
+            .map(({ id, date, amount, budget, payee }) => {
+              const b = budgets.find(b => b.id === budget) || {};
+
+              return (
+                <tr key={id}>
+                  <td data-label="Date">
+                    <A href={`/expense/${id}`}>
+                      {new Date(date).toLocaleDateString()}
+                    </A>
+                  </td>
+                  <td data-label="Budget">
+                    <span
+                      className="color-pill"
+                      style={{
+                        backgroundColor: b.color || "#212121"
+                      }}
+                    />
+                    <A href={`/expenses/${b.id}`}>{b.name}</A>
+                  </td>
+                  <td data-label="Payee">{payee || "–"}</td>
+                  <td data-label="Amount" className="tar">
+                    {formatAmountInCurrency(amount, currency)}
+                  </td>
+                </tr>
+              );
+            })}
+        </tbody>
+      </table>
+    );
+  };
 
   if (loading) {
     return null;
@@ -82,67 +231,32 @@ const Dashboard = () => {
     <>
       <Header />
       <main>
-        {renderBalanceMessage(
-          totalPlanned - totalCurrent,
-          currency,
-          formattedBudgets
-        )}
-        <A href="/new/expense" className="button button--primary jumbo">
-          New expense →
-        </A>
-        <hr />
-        <header className="mb3">
-          <h2 className="mb0">Recent expenses</h2>
-          <A href="/expenses">See all</A>
+        <header className="flex flex--between">
+          <h1 className="mb0">Budgets</h1>
+          <A
+            href={`/new/budget/${getYear(currentDate)}/${getMonth(
+              currentDate
+            )}`}
+            className="button button--primary"
+          >
+            New budget
+          </A>
         </header>
-        {formattedExpenses.length ? (
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Budget</th>
-                <th>Payee</th>
-                <th className="tar">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {formattedExpenses
-                .sort(compareBy("date", true))
-                .slice(0, 10)
-                .map(({ id, date, amount, budget, payee }) => {
-                  const b = budgets.find(b => b.id === budget) || {};
-
-                  return (
-                    <tr key={id}>
-                      <td data-label="Date">
-                        <A href={`/expense/${id}`}>
-                          {new Date(date).toLocaleDateString()}
-                        </A>
-                      </td>
-                      <td data-label="Budget">
-                        <span
-                          className="color-pill"
-                          style={{
-                            backgroundColor: b.color || "#212121"
-                          }}
-                        />
-                        <A href={`/expenses/${b.id}`}>{b.name}</A>
-                      </td>
-                      <td data-label="Payee">{payee || "–"}</td>
-                      <td data-label="Amount" className="tar">
-                        {formatAmountInCurrency(amount, currency)}
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
-        ) : (
-          <Blankslate
-            title="Nothing to show"
-            description="Looks like there are no expenses to show here yet."
-          />
-        )}
+        <section>
+          <h1>Overview</h1>
+          {renderOverview()}
+        </section>
+        <section>
+          <h1>Categories</h1>
+          {renderCategories()}
+        </section>
+        <header className="flex flex--between">
+          <h1 className="mb0">Expenses</h1>
+          <A href="/new/expense" className="button button--primary">
+            New expense
+          </A>
+        </header>
+        <section>{renderExpenses()}</section>
       </main>
       <Footer />
     </>

@@ -177,6 +177,19 @@ main > section:last-child {
   display: inline-block;
 }
 
+.legend {
+  list-style: none;
+  margin: 0.875rem 0 1.5rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.legend li {
+  margin-right: 1rem;
+  white-space: nowrap;
+}
+
 @media (max-width: 600px) {
   .bar {
     margin: 2rem 0 0;
