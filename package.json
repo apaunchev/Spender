@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "date-fns": "^2.0.1",
+    "file-saver": "^2.0.2",
     "hookrouter": "^1.2.3",
     "lodash": "^4.17.15",
     "react": "^16.9.0",

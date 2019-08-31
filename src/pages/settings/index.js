@@ -5,6 +5,7 @@ import Header from "../../components/header";
 import { CURRENCIES } from "../../consts";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { LOCAL_STORAGE_PREFIX } from "../../consts";
+import { saveAs } from "file-saver";
 
 const Settings = () => {
   // Local storage
@@ -44,6 +45,75 @@ const Settings = () => {
     }
   };
 
+  const onExport = e => {
+    e.preventDefault();
+
+    try {
+      const dataToExport = {
+        budgets: JSON.parse(
+          window.localStorage.getItem(`${LOCAL_STORAGE_PREFIX}budgets`)
+        ),
+        expenses: JSON.parse(
+          window.localStorage.getItem(`${LOCAL_STORAGE_PREFIX}expenses`)
+        ),
+        settings: JSON.parse(
+          window.localStorage.getItem(`${LOCAL_STORAGE_PREFIX}settings`)
+        )
+      };
+      const blob = new Blob([JSON.stringify(dataToExport)], {
+        type: "application/json"
+      });
+
+      saveAs(
+        blob,
+        `${LOCAL_STORAGE_PREFIX}export_${new Date().getTime()}.json`
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onFileSelect = e => {
+    const inputFiles = e.target.files;
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const { budgets, expenses, settings } = JSON.parse(reader.result);
+
+      if (!budgets || !expenses || !settings) {
+        console.error("No data to import in selected file.");
+        return;
+      }
+
+      if (
+        window.confirm(
+          `The selected file contains ${budgets.length} budgets and ${expenses.length} expenses. Importing it will overwrite existing data and this cannot be undone. Proceed?`
+        )
+      ) {
+        try {
+          window.localStorage.setItem(
+            `${LOCAL_STORAGE_PREFIX}budgets`,
+            JSON.stringify(budgets)
+          );
+          window.localStorage.setItem(
+            `${LOCAL_STORAGE_PREFIX}expenses`,
+            JSON.stringify(expenses)
+          );
+          window.localStorage.setItem(
+            `${LOCAL_STORAGE_PREFIX}settings`,
+            JSON.stringify(settings)
+          );
+
+          navigate("/dashboard");
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+
+    reader.readAsText(inputFiles[0]);
+  };
+
   return (
     <>
       <Header />
@@ -72,18 +142,33 @@ const Settings = () => {
               value="Save"
             />
           </div>
-          <h2>Stored data</h2>
-          <p>
-            Currently you have <strong>{budgets.length || 0} budgets</strong>{" "}
-            and <strong>{expenses.length || 0} expenses</strong> stored on your
-            device.
-          </p>
-          <p className="danger">
-            <a href="/" onClick={e => onDelete(e)}>
-              Erase stored data
-            </a>
-          </p>
         </form>
+        <hr />
+        <h2>Stored data</h2>
+        <p>
+          Currently you have <strong>{budgets.length || 0} budgets</strong> and{" "}
+          <strong>{expenses.length || 0} expenses</strong> stored on your
+          device.
+        </p>
+        <div className="button-group">
+          <button className="button" onClick={onExport}>
+            Export
+          </button>
+          <label htmlFor="import" className="button">
+            Import
+          </label>
+          <input
+            type="file"
+            id="import"
+            name="import"
+            onChange={onFileSelect}
+            accept=".json"
+            style={{ display: "none" }}
+          />
+          <button className="button" onClick={e => onDelete(e)}>
+            Erase
+          </button>
+        </div>
       </main>
       <Footer />
     </>
