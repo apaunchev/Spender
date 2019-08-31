@@ -1,10 +1,18 @@
+import {
+  format,
+  isWithinInterval,
+  startOfMonth,
+  endOfMonth,
+  getYear,
+  getMonth,
+  parseISO
+} from "date-fns";
 import { navigate } from "hookrouter";
 import React, { useState, useEffect } from "react";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { ID, toDateInputValue } from "../../utils";
-import { format } from "date-fns";
 
 const Expense = ({ id }) => {
   // Local storage
@@ -12,6 +20,7 @@ const Expense = ({ id }) => {
   const [budgets] = useLocalStorage("budgets", []);
 
   // State
+  const [formattedBudgets, setFormattedBudgets] = useState(budgets);
   const [amount, setAmount] = useState("");
   const [budget, setBudget] = useState("");
   const [date, setDate] = useState(toDateInputValue(new Date()));
@@ -35,6 +44,19 @@ const Expense = ({ id }) => {
       setNotes(notes);
     }
   }, [id, expenses]);
+
+  useEffect(() => {
+    if (date) {
+      setFormattedBudgets(
+        budgets.filter(b =>
+          isWithinInterval(new Date(b.date), {
+            start: startOfMonth(new Date(date)),
+            end: endOfMonth(new Date(date))
+          })
+        )
+      );
+    }
+  }, [date, budgets]);
 
   // Events
   const onSubmit = e => {
@@ -107,12 +129,24 @@ const Expense = ({ id }) => {
               <option value="" disabled hidden>
                 Select a budget...
               </option>
-              {budgets.map(({ id, name }) => (
+              {formattedBudgets.map(({ id, name }) => (
                 <option key={id} value={id}>
                   {name}
                 </option>
               ))}
             </select>
+            {!formattedBudgets.length ? (
+              <p className="danger mt2 mb0">
+                You have no budgets created for the selected date.{" "}
+                <a
+                  href={`/new/budget/${getYear(parseISO(date))}/${getMonth(
+                    parseISO(date)
+                  )}`}
+                >
+                  Create one?
+                </a>
+              </p>
+            ) : null}
           </div>
           <div className="form-input">
             <label htmlFor="date">Date</label>
