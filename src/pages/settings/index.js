@@ -68,8 +68,8 @@ const Settings = () => {
               value="Save"
             />
           </div>
-          <p>
-            <a className="danger" href="/" onClick={e => onDelete(e)}>
+          <p className="danger">
+            <a href="/" onClick={e => onDelete(e)}>
               Delete stored data
             </a>
           </p>
