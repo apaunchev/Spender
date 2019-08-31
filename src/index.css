@@ -463,6 +463,10 @@ input[type="submit"],
   font-weight: bold !important;
 }
 
+.italic {
+  font-style: italic !important;
+}
+
 .flex {
   display: flex;
   align-items: center;
