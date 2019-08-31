@@ -59,10 +59,10 @@ const Dashboard = () => {
     }
 
     return (
-      <h3>
-        You have <span className={className}>{formattedAmount}</span> to spend
-        this month.{" "}
-      </h3>
+      <h1>
+        You have <span className={className}>{formattedAmount}</span> left to
+        spend or save this month.
+      </h1>
     );
   };
 
