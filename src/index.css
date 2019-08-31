@@ -103,6 +103,10 @@ main > section:last-child {
   border-bottom: none;
 }
 
+nav a + a {
+  margin-left: 0.5rem;
+}
+
 /* Header */
 
 .header {

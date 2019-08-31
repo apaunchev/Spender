@@ -90,17 +90,20 @@ const Dashboard = () => {
         <header className="mb3 flex flex--between">
           <div>
             <h1 className="mb0">Budgets</h1>
-            <A
-              href={`/new/budget/${getYear(currentDate)}/${getMonth(
-                currentDate
-              )}`}
-            >
-              New budget
-            </A>
-            {" / "}
-            <A href={`/clone/${getYear(currentDate)}/${getMonth(currentDate)}`}>
-              Clone budgets
-            </A>
+            <nav>
+              <A
+                href={`/new/budget/${getYear(currentDate)}/${getMonth(
+                  currentDate
+                )}`}
+              >
+                New budget
+              </A>{" "}
+              <A
+                href={`/clone/${getYear(currentDate)}/${getMonth(currentDate)}`}
+              >
+                Clone budgets
+              </A>
+            </nav>
           </div>
           <MonthNav currentDate={currentDate} setCurrentDate={setCurrentDate} />
         </header>
