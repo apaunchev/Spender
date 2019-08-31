@@ -144,7 +144,7 @@ const Settings = () => {
           </div>
         </form>
         <hr />
-        <h2>Stored data</h2>
+        <h2>Manage your data</h2>
         <p>
           Currently you have <strong>{budgets.length || 0} budgets</strong> and{" "}
           <strong>{expenses.length || 0} expenses</strong> stored on your
