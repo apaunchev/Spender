@@ -211,7 +211,7 @@ const Dashboard = () => {
                         <td
                           data-label="Current"
                           className={`tar ${warningOrDangerClass}`}
-                          title={currentAsPercent}
+                          title={`${currentAsPercent} of budget`}
                         >
                           {formatAmountInCurrency(currentForBudget, currency)}{" "}
                           <small className="small-screen-only">
