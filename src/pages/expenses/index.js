@@ -80,31 +80,53 @@ const Expenses = ({ budgetId }) => {
     }
 
     return (
-      <div className="bar">
-        {Object.keys(budgetsWithAmountsAndOthers).map(budgetId => {
-          const { id, name, color, amount } = budgetsWithAmountsAndOthers[
-            budgetId
-          ];
-          const percentOfExpenses = formatAmountInPercent(
-            (amount / getTotalAmountFromArray(expenses)) * 100
-          );
+      <div className="chart">
+        <ol className="legend">
+          {Object.keys(budgetsWithAmountsAndOthers).map(budgetId => {
+            const { id, name, color, amount } = budgetsWithAmountsAndOthers[
+              budgetId
+            ];
+            const percentOfExpenses = formatAmountInPercent(
+              (amount / getTotalAmountFromArray(expenses)) * 100
+            );
 
-          return (
-            <div
-              key={id}
-              className="bar__segment"
-              style={{
-                backgroundColor: color,
-                width: percentOfExpenses
-              }}
-              title={`${name} (${percentOfExpenses})`}
-            >
-              <span className="bar__segment__title">
-                {name} ({percentOfExpenses})
-              </span>
-            </div>
-          );
-        })}
+            return (
+              <li key={id}>
+                <span
+                  className="color-pill"
+                  style={{
+                    backgroundColor: color || "#212121"
+                  }}
+                />
+                <span>
+                  {name} <small>({percentOfExpenses})</small>
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+        <div className="bar">
+          {Object.keys(budgetsWithAmountsAndOthers).map(budgetId => {
+            const { id, name, color, amount } = budgetsWithAmountsAndOthers[
+              budgetId
+            ];
+            const percentOfExpenses = formatAmountInPercent(
+              (amount / getTotalAmountFromArray(expenses)) * 100
+            );
+
+            return (
+              <div
+                key={id}
+                className="bar__segment"
+                style={{
+                  backgroundColor: color,
+                  width: percentOfExpenses
+                }}
+                title={`${name} (${percentOfExpenses})`}
+              />
+            );
+          })}
+        </div>
       </div>
     );
   };

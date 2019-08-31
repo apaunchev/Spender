@@ -62,7 +62,7 @@ const Dashboard = () => {
     const totalLeft = totalPlanned - totalCurrent;
 
     return (
-      <>
+      <div className="chart">
         <div className="bar" style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}>
           <span
             className="bar__segment"
@@ -99,7 +99,7 @@ const Dashboard = () => {
             </span>
           </li>
         </ol>
-      </>
+      </div>
     );
   };
 
@@ -127,7 +127,7 @@ const Dashboard = () => {
     ];
 
     return (
-      <>
+      <div className="chart">
         <div className="bar">
           {final.map(({ color, amount }, idx) => (
             <span
@@ -164,7 +164,7 @@ const Dashboard = () => {
             </li>
           ))}
         </ol>
-      </>
+      </div>
     );
   };
 
