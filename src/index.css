@@ -423,6 +423,26 @@ input[type="submit"],
   margin-bottom: 3rem;
 }
 
+.mt0 {
+  margin-top: 0;
+}
+
+.mt1 {
+  margin-top: 0.25rem;
+}
+
+.mt2 {
+  margin-top: 0.75rem;
+}
+
+.mt3 {
+  margin-top: 1.5rem;
+}
+
+.mt4 {
+  margin-top: 3rem;
+}
+
 .tal {
   text-align: left !important;
 }
