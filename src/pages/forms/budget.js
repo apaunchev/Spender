@@ -1,13 +1,13 @@
-import { format, subMonths, addMonths, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { navigate } from "hookrouter";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { CirclePicker } from "react-color";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
-import { BUDGET_NAMES } from "../../consts";
+import MonthNav from "../../components/month-nav";
+import { BUDGET_NAMES, DATE_FORMAT_ISO } from "../../consts";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { ID, renderDatalistFromArray } from "../../utils";
-import { DATE_FORMAT_ISO, DATE_FORMAT_HUMAN_SHORT } from "../../consts";
 
 const Budget = ({ id, year, month }) => {
   // Local storage
@@ -90,29 +90,7 @@ const Budget = ({ id, year, month }) => {
         <div>
           <h2>{!id ? "New" : "Edit"} budget</h2>
         </div>
-        <nav className="button-group">
-          <button
-            className="button"
-            onClick={() => setCurrentDate(subMonths(currentDate, 1))}
-            title="Jump to previous month"
-          >
-            &larr;
-          </button>
-          <button
-            className="button"
-            onClick={() => setCurrentDate(new Date())}
-            title="Jump to current month"
-          >
-            {format(currentDate, DATE_FORMAT_HUMAN_SHORT)}
-          </button>
-          <button
-            className="button"
-            onClick={() => setCurrentDate(addMonths(currentDate, 1))}
-            title="Jump to next month"
-          >
-            &rarr;
-          </button>
-        </nav>
+        <MonthNav currentDate={currentDate} setCurrentDate={setCurrentDate} />
       </header>
       <main>
         <form className="form" onSubmit={onSubmit}>

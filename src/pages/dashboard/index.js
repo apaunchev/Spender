@@ -1,18 +1,11 @@
-import {
-  addMonths,
-  format,
-  isWithinInterval,
-  startOfMonth,
-  endOfMonth,
-  subMonths
-} from "date-fns";
+import { endOfMonth, isWithinInterval, startOfMonth } from "date-fns";
 import { A } from "hookrouter";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
+import MonthNav from "../../components/month-nav";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { formatAmountInCurrency, getTotalAmountFromArray } from "../../utils";
-import { DATE_FORMAT_HUMAN_SHORT } from "../../consts";
 
 const Dashboard = () => {
   // Local storage
@@ -90,29 +83,7 @@ const Dashboard = () => {
             <h2 className="mb0">Dashboard</h2>
             <A href="/new/expense">New expense</A>
           </div>
-          <nav className="button-group">
-            <button
-              className="button"
-              onClick={() => setCurrentDate(subMonths(currentDate, 1))}
-              title="Jump to previous month"
-            >
-              &larr;
-            </button>
-            <button
-              className="button"
-              onClick={() => setCurrentDate(new Date())}
-              title="Jump to current month"
-            >
-              {format(currentDate, DATE_FORMAT_HUMAN_SHORT)}
-            </button>
-            <button
-              className="button"
-              onClick={() => setCurrentDate(addMonths(currentDate, 1))}
-              title="Jump to next month"
-            >
-              &rarr;
-            </button>
-          </nav>
+          <MonthNav currentDate={currentDate} setCurrentDate={setCurrentDate} />
         </header>
         {renderBalanceMessage(
           totalPlanned - totalCurrent,
