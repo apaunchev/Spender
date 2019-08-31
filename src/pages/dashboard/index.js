@@ -1,11 +1,15 @@
 import { endOfMonth, isWithinInterval, startOfMonth } from "date-fns";
 import { A } from "hookrouter";
 import React, { useEffect, useState } from "react";
+import Blankslate from "../../components/blankslate";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
-import MonthNav from "../../components/month-nav";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
-import { formatAmountInCurrency, getTotalAmountFromArray } from "../../utils";
+import {
+  compareBy,
+  formatAmountInCurrency,
+  getTotalAmountFromArray
+} from "../../utils";
 
 const Dashboard = () => {
   // Local storage
@@ -16,7 +20,7 @@ const Dashboard = () => {
 
   // State
   const [loading, setLoading] = useState(true);
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate] = useState(new Date());
   const [formattedBudgets, setFormattedBudgets] = useState(budgets);
   const [formattedExpenses, setFormattedExpenses] = useState(expenses);
 
@@ -78,17 +82,66 @@ const Dashboard = () => {
     <>
       <Header />
       <main>
-        <header className="mb3 flex flex--between">
-          <div>
-            <h2 className="mb0">Dashboard</h2>
-            <A href="/new/expense">New expense</A>
-          </div>
-          <MonthNav currentDate={currentDate} setCurrentDate={setCurrentDate} />
-        </header>
         {renderBalanceMessage(
           totalPlanned - totalCurrent,
           currency,
           formattedBudgets
+        )}
+        <A href="/new/expense" className="button button--primary jumbo">
+          New expense →
+        </A>
+        <hr />
+        <header className="mb3">
+          <h2 className="mb0">Recent expenses</h2>
+          <A href="/expenses">See all</A>
+        </header>
+        {formattedExpenses.length ? (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Budget</th>
+                <th>Payee</th>
+                <th className="tar">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {formattedExpenses
+                .sort(compareBy("date", true))
+                .slice(0, 10)
+                .map(({ id, date, amount, budget, payee }) => {
+                  const b = budgets.find(b => b.id === budget) || {};
+
+                  return (
+                    <tr key={id}>
+                      <td data-label="Date">
+                        <A href={`/expense/${id}`}>
+                          {new Date(date).toLocaleDateString()}
+                        </A>
+                      </td>
+                      <td data-label="Budget">
+                        <span
+                          className="color-pill"
+                          style={{
+                            backgroundColor: b.color || "#212121"
+                          }}
+                        />
+                        <A href={`/expenses/${b.id}`}>{b.name}</A>
+                      </td>
+                      <td data-label="Payee">{payee || "–"}</td>
+                      <td data-label="Amount" className="tar">
+                        {formatAmountInCurrency(amount, currency)}
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        ) : (
+          <Blankslate
+            title="Nothing to show"
+            description="Looks like there are no expenses to show here yet."
+          />
         )}
       </main>
       <Footer />
