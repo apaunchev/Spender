@@ -186,8 +186,8 @@ const Expense = ({ id }) => {
             />
           </div>
           {id && (
-            <p>
-              <a className="danger" href="/" onClick={e => onDelete(e, id)}>
+            <p className="danger">
+              <a href="/" onClick={e => onDelete(e, id)}>
                 Delete
               </a>
             </p>
