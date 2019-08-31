@@ -140,7 +140,7 @@ const Dashboard = () => {
                   if (currentForBudget > amount * 0.7) {
                     warningOrDangerClass = "warning";
                   }
-                  if (currentForBudget > amount) {
+                  if (currentForBudget >= amount) {
                     warningOrDangerClass = "danger";
                   }
 
