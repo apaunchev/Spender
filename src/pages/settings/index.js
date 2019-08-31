@@ -8,6 +8,8 @@ import { LOCAL_STORAGE_PREFIX } from "../../consts";
 
 const Settings = () => {
   // Local storage
+  const [budgets] = useLocalStorage("budgets", {});
+  const [expenses] = useLocalStorage("expenses", {});
   const [settings, setSettings] = useLocalStorage("settings", {});
 
   // State
@@ -28,12 +30,14 @@ const Settings = () => {
     try {
       if (
         window.confirm(
-          "Are you sure you want to delete your data? This operation cannot be reversed."
+          "Are you sure you want to erase your data? This operation cannot be undone."
         )
       ) {
         window.localStorage.removeItem(`${LOCAL_STORAGE_PREFIX}budgets`);
         window.localStorage.removeItem(`${LOCAL_STORAGE_PREFIX}expenses`);
         window.localStorage.removeItem(`${LOCAL_STORAGE_PREFIX}settings`);
+
+        navigate("/dashboard");
       }
     } catch (error) {
       console.error(error);
@@ -68,9 +72,15 @@ const Settings = () => {
               value="Save"
             />
           </div>
+          <h3>Stored data</h3>
+          <p>
+            Currently you have <strong>{budgets.length || 0} budgets</strong>{" "}
+            and <strong>{expenses.length || 0} expenses</strong> stored on your
+            device, along with the settings from this page.
+          </p>
           <p className="danger">
             <a href="/" onClick={e => onDelete(e)}>
-              Delete stored data
+              Erase stored data
             </a>
           </p>
         </form>
