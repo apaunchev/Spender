@@ -219,7 +219,7 @@ const Dashboard = () => {
         <tbody>
           {formattedExpenses
             .sort(compareBy("date", true))
-            .slice(0, 10)
+            .slice(0, 5)
             .map(({ id, date, amount, budget, payee }) => {
               const b = budgets.find(b => b.id === budget) || {};
 
