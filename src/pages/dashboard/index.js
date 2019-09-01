@@ -3,8 +3,7 @@ import {
   getMonth,
   getYear,
   isWithinInterval,
-  startOfMonth,
-  format
+  startOfMonth
 } from "date-fns";
 import { A } from "hookrouter";
 import { chain, reduce } from "lodash";
