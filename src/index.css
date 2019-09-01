@@ -97,11 +97,6 @@ main > section {
   margin: 1.5rem 0;
 }
 
-main > section:last-child {
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
 nav a + a {
   margin-left: 1rem;
 }
@@ -272,35 +267,6 @@ nav a + a {
   padding: 1.5rem;
   background-color: var(--inputBackground);
   text-align: center;
-}
-
-/* Balance */
-
-.balance {
-  line-height: 1;
-  box-shadow: inset 0 0 0 1px var(--inputBackground);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.balance--safe,
-.balance--risky,
-.balance--dangerous {
-  position: relative;
-  color: #fff;
-  padding: 0 0.25em;
-}
-
-.balance--safe {
-  background-color: var(--green);
-}
-
-.balance--risky {
-  background-color: var(--orange);
-}
-
-.balance--dangerous {
-  background-color: var(--red);
 }
 
 /* Buttons */
@@ -499,14 +465,6 @@ input[type="submit"],
 
 .success {
   color: var(--green) !important;
-}
-
-.tappable {
-  cursor: pointer;
-}
-
-.no-wrap {
-  white-space: nowrap;
 }
 
 .small-screen-only {
