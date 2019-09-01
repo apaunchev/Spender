@@ -456,6 +456,12 @@ input[type="submit"],
   font-size: 125% !important;
 }
 
+@media (max-width: 600px) {
+  .jumbo {
+    font-size: 100% !important;
+  }
+}
+
 .bold {
   font-weight: bold !important;
 }
