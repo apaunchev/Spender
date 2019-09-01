@@ -15,12 +15,15 @@ const Settings = () => {
 
   // State
   const [currency, setCurrency] = useState(settings.currency || "EUR");
+  const [dashboardLimit, setDashboardLimit] = useState(
+    settings.dashboardLimit || 5
+  );
 
   // Events
   const onSubmit = e => {
     e.preventDefault();
 
-    setSettings({ ...settings, currency });
+    setSettings({ ...settings, currency, dashboardLimit });
 
     navigate("/dashboard");
   };
@@ -137,6 +140,24 @@ const Settings = () => {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="form-input">
+            <label htmlFor="dashboardLimit">Dashboard limit</label>
+            <p className="mb2">
+              <small>
+                Controls how many items per section to show on the dashboard.
+              </small>
+            </p>
+            <input
+              type="number"
+              id="dashboardLimit"
+              name="dashboardLimit"
+              min={1}
+              max={20}
+              step={1}
+              value={dashboardLimit}
+              onChange={e => setDashboardLimit(e.target.value)}
+            />
           </div>
           <div className="form-input">
             <input

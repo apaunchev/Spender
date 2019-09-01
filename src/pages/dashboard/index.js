@@ -26,6 +26,7 @@ const Dashboard = () => {
   const [budgets] = useLocalStorage("budgets", []);
   const [settings] = useLocalStorage("settings", []);
   const currency = settings.currency || "EUR";
+  const dashboardLimit = settings.dashboardLimit || 5;
 
   // State
   const [loading, setLoading] = useState(true);
@@ -84,11 +85,11 @@ const Dashboard = () => {
       .sortBy(b => -b.amount)
       .value();
     const final = [
-      ...formatted.slice(0, 5),
+      ...formatted.slice(0, dashboardLimit),
       {
         id: "_others",
         name: "Others",
-        amount: getTotalAmountFromArray(formatted.slice(5))
+        amount: getTotalAmountFromArray(formatted.slice(dashboardLimit))
       }
     ];
 
@@ -212,7 +213,7 @@ const Dashboard = () => {
                     amount: reduce(b, (prev, curr) => prev + curr.amount, 0)
                   }))
                   .sortBy(b => -b.times)
-                  .slice(0, 5)
+                  .slice(0, dashboardLimit)
                   .map(({ name, times, amount }) => {
                     return (
                       <tr key={name}>
@@ -256,7 +257,7 @@ const Dashboard = () => {
         <tbody>
           {formattedExpenses
             .sort(compareBy("date", true))
-            .slice(0, 5)
+            .slice(0, dashboardLimit)
             .map(({ id, date, amount, budget, payee }) => {
               const b = budgets.find(b => b.id === budget) || {};
 
