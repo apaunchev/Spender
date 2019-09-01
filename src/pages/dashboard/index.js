@@ -319,7 +319,10 @@ const Dashboard = () => {
         <section>{renderBudgets()}</section>
         <header>
           <h1 className="mb0">Expenses</h1>
-          <A href="/new/expense">New expense</A>
+          <nav>
+            <A href="/new/expense">New expense</A>{" "}
+            <A href={`/expenses`}>Browse all</A>
+          </nav>
         </header>
         <section>{renderExpenses()}</section>
       </main>
