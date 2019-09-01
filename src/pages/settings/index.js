@@ -122,6 +122,9 @@ const Settings = () => {
         <form className="form" onSubmit={onSubmit}>
           <div className="form-input">
             <label htmlFor="currency">Currency</label>
+            <p className="mb2">
+              <small>Controls the currency sign used across the app.</small>
+            </p>
             <select
               name="currency"
               id="currency"
