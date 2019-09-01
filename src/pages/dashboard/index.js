@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import Blankslate from "../../components/blankslate";
 import Footer from "../../components/footer";
 import Header from "../../components/header";
+import MonthNav from "../../components/month-nav";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import {
   compareBy,
@@ -28,7 +29,7 @@ const Dashboard = () => {
 
   // State
   const [loading, setLoading] = useState(true);
-  const [currentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [formattedBudgets, setFormattedBudgets] = useState(budgets);
   const [formattedExpenses, setFormattedExpenses] = useState(expenses);
 
@@ -258,20 +259,25 @@ const Dashboard = () => {
     <>
       <Header />
       <main>
-        <header>
-          <h1 className="mb0">Budgets</h1>
-          <nav>
-            <A
-              href={`/new/budget/${getYear(currentDate)}/${getMonth(
-                currentDate
-              )}`}
-            >
-              New budget
-            </A>{" "}
-            <A href={`/clone/${getYear(currentDate)}/${getMonth(currentDate)}`}>
-              Clone budgets
-            </A>
-          </nav>
+        <header className="flex flex--between">
+          <div>
+            <h1 className="mb0">Budgets</h1>
+            <nav>
+              <A
+                href={`/new/budget/${getYear(currentDate)}/${getMonth(
+                  currentDate
+                )}`}
+              >
+                New budget
+              </A>{" "}
+              <A
+                href={`/clone/${getYear(currentDate)}/${getMonth(currentDate)}`}
+              >
+                Clone budgets
+              </A>
+            </nav>
+          </div>
+          <MonthNav currentDate={currentDate} setCurrentDate={setCurrentDate} />
         </header>
         <section>{renderBudgets()}</section>
         <header>
