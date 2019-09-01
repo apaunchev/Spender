@@ -192,6 +192,43 @@ const Dashboard = () => {
             </div>
           </>
         ) : null}
+        {totalCurrent > 0 ? (
+          <>
+            <h2>Payees</h2>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Payee</th>
+                  <th>Times</th>
+                  <th className="tar">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {chain(formattedExpenses)
+                  .groupBy("payee")
+                  .map((b, k) => ({
+                    name: k,
+                    times: b.length,
+                    amount: reduce(b, (prev, curr) => prev + curr.amount, 0)
+                  }))
+                  .sortBy(b => -b.times)
+                  .slice(0, 5)
+                  .map(({ name, times, amount }) => {
+                    return (
+                      <tr key={name}>
+                        <td data-label="Payee">{name}</td>
+                        <td data-label="Times">{times}</td>
+                        <td data-label="Amount" className="tar">
+                          {formatAmountInCurrency(amount, currency)}
+                        </td>
+                      </tr>
+                    );
+                  })
+                  .value()}
+              </tbody>
+            </table>
+          </>
+        ) : null}
       </>
     );
   };
