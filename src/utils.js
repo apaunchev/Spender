@@ -22,11 +22,16 @@ export const formatAmountInCurrency = (amount = 0, currency = "EUR") => {
   return formatter.format(amount);
 };
 
-export const formatAmountInPercent = (amount = 0, decimals = 2) =>
-  Number(amount / 100).toLocaleString(getBrowserLanguage(), {
+export const formatAmountInPercent = (amount = 0, decimals = 2) => {
+  if (isNaN(amount)) {
+    return;
+  }
+
+  return Number(amount / 100).toLocaleString(getBrowserLanguage(), {
     style: "percent",
     minimumFractionDigits: decimals
   });
+};
 
 export const ID = () => {
   return (
