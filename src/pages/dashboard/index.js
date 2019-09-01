@@ -3,7 +3,8 @@ import {
   getMonth,
   getYear,
   isWithinInterval,
-  startOfMonth
+  startOfMonth,
+  format
 } from "date-fns";
 import { A } from "hookrouter";
 import { chain, reduce } from "lodash";
@@ -56,54 +57,19 @@ const Dashboard = () => {
   }, [budgets, expenses, currentDate]);
 
   // Helpers
-  const renderOverview = () => {
+  const renderBudgets = () => {
+    if (!formattedBudgets.length) {
+      return (
+        <Blankslate
+          title="Nothing to show"
+          description="Looks like you have not added any budgets for this month yet."
+        />
+      );
+    }
+
     const totalPlanned = getTotalAmountFromArray(formattedBudgets);
     const totalCurrent = getTotalAmountFromArray(formattedExpenses);
     const totalLeft = totalPlanned - totalCurrent;
-
-    return (
-      <div className="chart">
-        <ol className="legend">
-          <li>
-            <span
-              className="color-pill"
-              style={{ backgroundColor: "#54a0e8" }}
-            />
-            <span>
-              Spent - {formatAmountInCurrency(totalCurrent, currency)}{" "}
-              <small>
-                ({formatAmountInPercent((totalCurrent / totalPlanned) * 100)})
-              </small>
-            </span>
-          </li>
-          <li>
-            <span
-              className="color-pill"
-              style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}
-            />
-            <span>
-              Left to spend or save -{" "}
-              <mark>{formatAmountInCurrency(totalLeft, currency)}</mark>{" "}
-              <small>
-                ({formatAmountInPercent((totalLeft / totalPlanned) * 100)})
-              </small>
-            </span>
-          </li>
-        </ol>
-        <div className="bar" style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}>
-          <span
-            className="bar__segment"
-            style={{
-              backgroundColor: "#54a0e8",
-              width: `${(totalCurrent / totalPlanned) * 100}%`
-            }}
-          ></span>
-        </div>
-      </div>
-    );
-  };
-
-  const renderCategories = () => {
     const formatted = chain(formattedExpenses)
       .map(e => ({
         ...e,
@@ -127,44 +93,106 @@ const Dashboard = () => {
     ];
 
     return (
-      <div className="chart">
-        <ol className="legend">
-          {final.map(({ name, color, amount }, idx) => (
-            <li key={`g-${idx}`}>
+      <>
+        <h2>Overview</h2>
+        <div className="chart">
+          <ol className="legend">
+            <li>
               <span
                 className="color-pill"
-                style={{
-                  backgroundColor: color || "#212121"
-                }}
+                style={{ backgroundColor: "#54a0e8" }}
               />
               <span>
-                {name} - {formatAmountInCurrency(amount, currency)}{" "}
-                <small>
-                  (
-                  {formatAmountInPercent(
-                    (amount / getTotalAmountFromArray(formattedExpenses)) * 100
-                  )}
-                  )
-                </small>
+                Spent - {formatAmountInCurrency(totalCurrent, currency)}
+                {totalPlanned > 0 ? (
+                  <small>
+                    {" "}
+                    (
+                    {formatAmountInPercent((totalCurrent / totalPlanned) * 100)}
+                    )
+                  </small>
+                ) : null}
               </span>
             </li>
-          ))}
-        </ol>
-        <div className="bar">
-          {final.map(({ color, amount }, idx) => (
+            <li>
+              <span
+                className="color-pill"
+                style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}
+              />
+              <span>
+                Left to spend or save -{" "}
+                {formatAmountInCurrency(totalLeft, currency)}
+                {totalPlanned > 0 ? (
+                  <small>
+                    {" "}
+                    ({formatAmountInPercent((totalLeft / totalPlanned) * 100)})
+                  </small>
+                ) : null}
+              </span>
+            </li>
+          </ol>
+          <div
+            className="bar"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}
+          >
             <span
-              key={`g-${idx}`}
               className="bar__segment"
               style={{
-                backgroundColor: color,
-                width: `${(amount /
-                  getTotalAmountFromArray(formattedExpenses)) *
-                  100}%`
+                backgroundColor: "#54a0e8",
+                width: `${(totalCurrent / totalPlanned) * 100}%`
               }}
-            />
-          ))}
+            ></span>
+          </div>
         </div>
-      </div>
+        {totalCurrent > 0 ? (
+          <>
+            <h2>Categories</h2>
+            <div className="chart">
+              <ol className="legend">
+                {final.map(({ name, color, amount }, idx) => (
+                  <li key={`g-${idx}`}>
+                    <span
+                      className="color-pill"
+                      style={{
+                        backgroundColor: color || "#212121"
+                      }}
+                    />
+                    <span>
+                      {name} - {formatAmountInCurrency(amount, currency)}
+                      {getTotalAmountFromArray(formattedExpenses) > 0 ? (
+                        <small>
+                          {" "}
+                          (
+                          {formatAmountInPercent(
+                            (amount /
+                              getTotalAmountFromArray(formattedExpenses)) *
+                              100
+                          )}
+                          )
+                        </small>
+                      ) : null}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <div className="bar">
+                {final.map(({ color, amount }, idx) => (
+                  <span
+                    key={`g-${idx}`}
+                    className="bar__segment"
+                    style={{
+                      backgroundColor: color,
+                      width: `${(amount /
+                        getTotalAmountFromArray(formattedExpenses)) *
+                        100}%`
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </>
+        ) : null}
+      </>
     );
   };
 
@@ -173,7 +201,7 @@ const Dashboard = () => {
       return (
         <Blankslate
           title="Nothing to show"
-          description="Looks like there are no expenses to show here yet."
+          description="Looks like you have not added any expenses for this month yet."
         />
       );
     }
@@ -233,22 +261,20 @@ const Dashboard = () => {
       <main>
         <header>
           <h1 className="mb0">Budgets</h1>
-          <A
-            href={`/new/budget/${getYear(currentDate)}/${getMonth(
-              currentDate
-            )}`}
-          >
-            New budget
-          </A>
+          <nav>
+            <A
+              href={`/new/budget/${getYear(currentDate)}/${getMonth(
+                currentDate
+              )}`}
+            >
+              New budget
+            </A>{" "}
+            <A href={`/clone/${getYear(currentDate)}/${getMonth(currentDate)}`}>
+              Clone budgets
+            </A>
+          </nav>
         </header>
-        <section>
-          <h1>Overview</h1>
-          {renderOverview()}
-        </section>
-        <section>
-          <h1>Categories</h1>
-          {renderCategories()}
-        </section>
+        <section>{renderBudgets()}</section>
         <header>
           <h1 className="mb0">Expenses</h1>
           <A href="/new/expense">New expense</A>

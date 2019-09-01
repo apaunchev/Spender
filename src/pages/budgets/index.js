@@ -191,7 +191,7 @@ const Dashboard = () => {
         ) : (
           <Blankslate
             title="Nothing to show"
-            description="Looks like there are no categories to show here yet."
+            description="Looks like you have not added any budgets for this month yet."
           />
         )}
       </main>

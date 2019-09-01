@@ -233,7 +233,7 @@ const Expenses = ({ budgetId }) => {
         ) : (
           <Blankslate
             title="Nothing to show"
-            description="Looks like there are no expenses to show here yet."
+            description="Looks like you have not added any expenses for this month yet."
           />
         )}
       </main>

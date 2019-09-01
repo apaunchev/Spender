@@ -138,7 +138,7 @@ const Expense = ({ id }) => {
             </select>
             {!formattedBudgets.length ? (
               <p className="danger mt2 mb0">
-                You have no budgets created for the selected date.{" "}
+                You have no budgets for the selected month.{" "}
                 <a
                   href={`/new/budget/${getYear(parseISO(date))}/${getMonth(
                     parseISO(date)
