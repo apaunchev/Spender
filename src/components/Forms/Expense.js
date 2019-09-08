@@ -1,33 +1,27 @@
 import {
-  endOfMonth,
   fromUnixTime,
   getMonth,
   getUnixTime,
   getYear,
-  isWithinInterval,
-  parseISO,
-  startOfMonth
+  parseISO
 } from "date-fns";
-import { chain } from "lodash";
 import React, { Component } from "react";
-import { compose } from "recompose";
-import withBudgets from "../Budgets/withBudgets";
 import { withFirebase } from "../Firebase";
-import { AuthUserContext } from "../Session";
 import { toDateInputValue } from "../utils";
-
-const INITIAL_STATE = {
-  amount: "",
-  budgetId: "",
-  date: getUnixTime(new Date()),
-  payee: "",
-  notes: ""
-};
+import { compose } from "recompose";
+import { withAuthUser } from "../Session/context";
 
 class Expense extends Component {
   state = {
     loading: false,
-    expense: null,
+    expense: {
+      amount: "",
+      budgetId: "",
+      date: getUnixTime(new Date()),
+      payee: "",
+      notes: ""
+    },
+    budgets: [],
     ...this.props.location.state
   };
 
@@ -39,10 +33,6 @@ class Expense extends Component {
       firebase
     } = this.props;
     const { expense } = this.state;
-
-    if (!id) {
-      this.setState({ ...this.state, expense: INITIAL_STATE });
-    }
 
     if (id && !expense) {
       this.setState({ loading: true });
@@ -84,6 +74,15 @@ class Expense extends Component {
     });
   };
 
+  onDateChange = event => {
+    this.setState({
+      expense: {
+        ...this.state.expense,
+        date: getUnixTime(parseISO(event.target.value))
+      }
+    });
+  };
+
   onSubmit = event => {
     event.preventDefault();
 
@@ -95,9 +94,9 @@ class Expense extends Component {
         params: { id }
       },
       history,
-      firebase
+      firebase,
+      authUser
     } = this.props;
-    const authUser = this.context;
 
     if (!id) {
       // create
@@ -143,25 +142,13 @@ class Expense extends Component {
     const {
       match: {
         params: { id }
-      },
-      budgets
+      }
     } = this.props;
-    const { loading } = this.state;
+    const { loading, expense, budgets } = this.state;
 
-    if (loading || !budgets.length) {
+    if (loading) {
       return null;
     }
-
-    const { expense } = this.state;
-    const formattedBudgets = chain(budgets)
-      .filter(b =>
-        isWithinInterval(fromUnixTime(b.date), {
-          start: startOfMonth(fromUnixTime(expense.date)),
-          end: endOfMonth(fromUnixTime(expense.date))
-        })
-      )
-      .sortBy(b => b.name)
-      .value();
 
     return (
       <main>
@@ -194,13 +181,13 @@ class Expense extends Component {
               <option value="" disabled hidden>
                 Select a budget...
               </option>
-              {formattedBudgets.map(({ id, name }) => (
+              {budgets.map(({ id, name }) => (
                 <option key={id} value={id}>
                   {name}
                 </option>
               ))}
             </select>
-            {!formattedBudgets.length ? (
+            {!budgets.length ? (
               <p className="danger mt2 mb0">
                 You have no budgets for the selected month.{" "}
                 <a
@@ -220,7 +207,7 @@ class Expense extends Component {
               id="date"
               name="date"
               value={toDateInputValue(fromUnixTime(expense.date))}
-              onChange={this.onInputChange}
+              onChange={this.onDateChange}
               required
             />
           </div>
@@ -266,9 +253,7 @@ class Expense extends Component {
   }
 }
 
-Expense.contextType = AuthUserContext;
-
 export default compose(
   withFirebase,
-  withBudgets
+  withAuthUser
 )(Expense);

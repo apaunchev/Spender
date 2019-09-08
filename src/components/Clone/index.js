@@ -3,32 +3,55 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import { DATE_FORMAT_HUMAN, DATE_FORMAT_ISO } from "../../constants/formats";
-import withBudgets from "../Budgets/withBudgets";
 import { withFirebase } from "../Firebase";
+import { withAuthUser } from "../Session";
 
 class Clone extends Component {
   state = {
+    loading: false,
     currentDate: new Date(),
-    cloneFromMonth: ""
+    cloneFromMonth: "",
+    budgets: []
   };
 
   componentDidMount() {
     const {
       match: {
         params: { month, year }
-      }
+      },
+      firebase,
+      authUser
     } = this.props;
 
     if (year && month) {
-      this.setState({ currentDate: new Date(year, month, 1) });
+      this.setState({ currentDate: new Date(year, month, 1), loading: true });
+
+      firebase
+        .budgets()
+        .where("userId", "==", authUser.uid)
+        .get()
+        .then(snapshot => {
+          if (snapshot.size) {
+            let budgets = [];
+            snapshot.forEach(doc =>
+              budgets.push({ ...doc.data(), id: doc.id })
+            );
+            this.setState({ budgets });
+          } else {
+            this.setState({ budgets: [] });
+          }
+
+          this.setState({ loading: false });
+        })
+        .catch(error => console.error(error));
     }
   }
 
   onSubmit = event => {
     event.preventDefault();
 
-    const { budgets, history, firebase } = this.props;
-    const { currentDate, cloneFromMonth } = this.state;
+    const { history, firebase } = this.props;
+    const { currentDate, cloneFromMonth, budgets } = this.state;
 
     const budgetsToClone = budgets
       .filter(
@@ -60,8 +83,12 @@ class Clone extends Component {
   };
 
   render() {
-    const { currentDate, cloneFromMonth } = this.state;
-    const { budgets } = this.props;
+    const { loading, currentDate, cloneFromMonth, budgets } = this.state;
+
+    if (loading) {
+      return null;
+    }
+
     const getAvailableMonthsFromBudgets = budgets
       .map(b => fromUnixTime(b.date))
       .filter(
@@ -121,5 +148,5 @@ class Clone extends Component {
 export default compose(
   withRouter,
   withFirebase,
-  withBudgets
+  withAuthUser
 )(Clone);

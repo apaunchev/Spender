@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import CURRENCIES from "../../constants/currencies";
 import * as ROUTES from "../../constants/routes";
-import { AuthUserContext, withAuthorization } from "../Session";
+import { withAuthUser, withAuthorization } from "../Session";
+import { compose } from "recompose";
 
 class Settings extends Component {
   state = {
-    currency: this.context.currency || "EUR"
+    currency: this.props.authUser.currency || "EUR"
   };
 
   onInputChange = event => {
@@ -22,10 +23,10 @@ class Settings extends Component {
     event.preventDefault();
 
     const { currency } = this.state;
-    const { firebase } = this.props;
+    const { firebase, authUser } = this.props;
 
     firebase
-      .user(this.context.uid)
+      .user(authUser.uid)
       .set({ currency }, { merge: true })
       .then(() => (window.location.href = ROUTES.DASHBOARD));
   };
@@ -68,8 +69,9 @@ class Settings extends Component {
   }
 }
 
-Settings.contextType = AuthUserContext;
-
 const condition = authUser => !!authUser;
 
-export default withAuthorization(condition)(Settings);
+export default compose(
+  withAuthUser,
+  withAuthorization(condition)
+)(Settings);

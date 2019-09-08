@@ -1,22 +1,21 @@
-import { fromUnixTime, getUnixTime } from "date-fns";
+import { fromUnixTime, getUnixTime, startOfMonth } from "date-fns";
 import React, { Component } from "react";
 import { CirclePicker } from "react-color";
 import BUDGET_NAMES from "../../constants/budgets";
 import { withFirebase } from "../Firebase";
 import MonthNav from "../MonthNav";
-import { AuthUserContext } from "../Session";
+import { withAuthUser } from "../Session";
 import { renderDatalistFromArray } from "../utils";
-
-const INITIAL_STATE = {
-  name: "",
-  amount: "",
-  color: "#000000"
-};
+import { compose } from "recompose";
 
 class Budget extends Component {
   state = {
     loading: false,
-    budget: null,
+    budget: {
+      name: "",
+      amount: "",
+      color: "#000000"
+    },
     currentDate: new Date(),
     ...this.props.location.state
   };
@@ -29,10 +28,6 @@ class Budget extends Component {
       firebase
     } = this.props;
     const { budget } = this.state;
-
-    if (!id) {
-      this.setState({ ...this.state, budget: INITIAL_STATE });
-    }
 
     if (id && !budget) {
       this.setState({ loading: true });
@@ -93,15 +88,15 @@ class Budget extends Component {
         params: { id }
       },
       history,
-      firebase
+      firebase,
+      authUser
     } = this.props;
-    const authUser = this.context;
 
     if (!id) {
       // create
       firebase.budgets().add({
         name,
-        date: getUnixTime(currentDate),
+        date: getUnixTime(startOfMonth(currentDate)),
         amount: parseFloat(amount),
         color,
         userId: authUser.uid
@@ -111,7 +106,7 @@ class Budget extends Component {
       firebase.budget(id).set(
         {
           name,
-          date: getUnixTime(currentDate),
+          date: getUnixTime(startOfMonth(currentDate)),
           amount: parseFloat(amount),
           color
         },
@@ -218,6 +213,7 @@ class Budget extends Component {
   }
 }
 
-Budget.contextType = AuthUserContext;
-
-export default withFirebase(Budget);
+export default compose(
+  withAuthUser,
+  withFirebase
+)(Budget);
