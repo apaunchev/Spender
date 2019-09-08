@@ -163,7 +163,7 @@ class Expenses extends Component {
 const condition = authUser => !!authUser;
 
 export default compose(
+  withAuthorization(condition),
   withBudgets,
-  withExpenses,
-  withAuthorization(condition)
+  withExpenses
 )(Expenses);

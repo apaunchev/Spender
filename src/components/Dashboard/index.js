@@ -224,7 +224,7 @@ class Dashboard extends Component {
 const condition = authUser => !!authUser;
 
 export default compose(
+  withAuthorization(condition),
   withExpenses,
-  withBudgets,
-  withAuthorization(condition)
+  withBudgets
 )(Dashboard);
