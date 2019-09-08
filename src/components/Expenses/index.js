@@ -24,11 +24,6 @@ class Expenses extends Component {
     this.setState({ currentDate });
   };
 
-  getBudgetName(budgetId) {
-    return (this.state.formattedBudgets.find(b => b.id === budgetId) || {})
-      .name;
-  }
-
   render() {
     const { currentDate } = this.state;
     const { budgets, expenses } = this.props;
