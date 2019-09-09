@@ -8,7 +8,7 @@ const Intro = () => (
   <AuthUserContext.Consumer>
     {authUser =>
       authUser ? (
-        <Redirect to={ROUTES.DASHBOARD} />
+        <Redirect to={ROUTES.EXPENSES} />
       ) : (
         <main className="jumbo">
           <h1>

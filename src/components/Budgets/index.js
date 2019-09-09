@@ -1,9 +1,9 @@
 import {
   endOfMonth,
-  getMonth,
   getUnixTime,
+  startOfMonth,
   getYear,
-  startOfMonth
+  getMonth
 } from "date-fns";
 import { chain } from "lodash";
 import React, { Component } from "react";
@@ -118,14 +118,10 @@ class Budgets extends Component {
         <header className="mb3 flex flex--between">
           <div>
             <h1 className="mb0">Budgets</h1>
-            <nav>
-              <Link
-                to={`/new/budget/${getYear(currentDate)}/${getMonth(
-                  currentDate
-                )}`}
-              >
+            <nav className="nav nav--small">
+              <Link to={{ pathname: "/new/budget", state: { currentDate } }}>
                 New budget
-              </Link>{" "}
+              </Link>
               <Link
                 to={`/clone/${getYear(currentDate)}/${getMonth(currentDate)}`}
               >
@@ -151,41 +147,48 @@ class Budgets extends Component {
 
               return (
                 <li className="budget" key={budget.id}>
-                  <div className="budget-title">
-                    <Link
-                      to={{
-                        pathname: `/budget/${budget.id}`,
-                        state: { budget }
-                      }}
+                  <Link
+                    to={{
+                      pathname: `/budget/${budget.id}`,
+                      state: { budget }
+                    }}
+                  >
+                    <div className="budget-title">
+                      <div>
+                        <span
+                          className="color-pill"
+                          style={{ backgroundColor: budget.color }}
+                        />
+                        {budget.name}
+                      </div>
+                      <div>
+                        <span className={warningOrDangerClass}>
+                          {formatAmountInCurrency(
+                            budget.current,
+                            authUser.currency
+                          )}{" "}
+                          /{" "}
+                          {formatAmountInCurrency(
+                            budget.amount,
+                            authUser.currency
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                    <div
+                      className="bar bar--small"
+                      style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}
                     >
                       <span
-                        className="color-pill"
-                        style={{ backgroundColor: budget.color }}
-                      />
-                      {budget.name}
-                    </Link>
-                    <em className={warningOrDangerClass}>
-                      {formatAmountInCurrency(
-                        budget.current,
-                        authUser.currency
-                      )}{" "}
-                      /{" "}
-                      {formatAmountInCurrency(budget.amount, authUser.currency)}
-                    </em>
-                  </div>
-                  <div
-                    className="bar bar--small"
-                    style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}
-                  >
-                    <span
-                      className="bar__segment"
-                      style={{
-                        width: `${formatAmountInPercent(
-                          (budget.current / budget.amount) * 100
-                        )}`
-                      }}
-                    ></span>
-                  </div>
+                        className="bar__segment"
+                        style={{
+                          width: `${formatAmountInPercent(
+                            (budget.current / budget.amount) * 100
+                          )}`
+                        }}
+                      ></span>
+                    </div>
+                  </Link>
                 </li>
               );
             })}

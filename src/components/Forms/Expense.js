@@ -1,14 +1,14 @@
 import {
-  fromUnixTime,
-  getMonth,
+  endOfMonth,
+  format,
   getUnixTime,
-  getYear,
-  parseISO
+  parseISO,
+  startOfMonth
 } from "date-fns";
 import React, { Component } from "react";
-import { withFirebase } from "../Firebase";
-import { toDateInputValue } from "../utils";
 import { compose } from "recompose";
+import { DATE_FORMAT_ISO } from "../../constants/formats";
+import { withFirebase } from "../Firebase";
 import { withAuthUser } from "../Session/context";
 
 class Expense extends Component {
@@ -17,7 +17,7 @@ class Expense extends Component {
     expense: {
       amount: "",
       budgetId: "",
-      date: getUnixTime(new Date()),
+      date: format(new Date(), DATE_FORMAT_ISO),
       payee: "",
       notes: ""
     },
@@ -32,7 +32,11 @@ class Expense extends Component {
       },
       firebase
     } = this.props;
-    const { expense } = this.state;
+    const { expense, budgets } = this.state;
+
+    if (!budgets.length) {
+      this.fetchBudgets(expense.date);
+    }
 
     if (id && !expense) {
       this.setState({ loading: true });
@@ -44,6 +48,7 @@ class Expense extends Component {
         .then(doc => {
           if (doc.exists) {
             const { amount, budgetId, date, payee, notes } = doc.data();
+
             this.setState({
               expense: {
                 amount,
@@ -61,6 +66,33 @@ class Expense extends Component {
     }
   }
 
+  fetchBudgets(currentDate) {
+    const { firebase, authUser } = this.props;
+
+    this.setState({ loading: true });
+
+    return firebase
+      .budgets()
+      .where("userId", "==", authUser.uid)
+      .where("date", ">=", getUnixTime(startOfMonth(parseISO(currentDate))))
+      .where("date", "<=", getUnixTime(endOfMonth(parseISO(currentDate))))
+      .orderBy("date")
+      .orderBy("name")
+      .get()
+      .then(snapshot => {
+        if (snapshot.size) {
+          let budgets = [];
+          snapshot.forEach(doc => budgets.push({ ...doc.data(), id: doc.id }));
+          this.setState({ budgets });
+        } else {
+          this.setState({ budgets: [] });
+        }
+
+        this.setState({ loading: false });
+      })
+      .catch(error => console.error(error));
+  }
+
   onInputChange = event => {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
@@ -75,12 +107,13 @@ class Expense extends Component {
   };
 
   onDateChange = event => {
+    const date = event.target.value;
+
     this.setState({
-      expense: {
-        ...this.state.expense,
-        date: getUnixTime(parseISO(event.target.value))
-      }
+      expense: { ...this.state.expense, date }
     });
+
+    this.fetchBudgets(date);
   };
 
   onSubmit = event => {
@@ -103,7 +136,7 @@ class Expense extends Component {
       firebase.expenses().add({
         amount: parseFloat(amount),
         budgetId,
-        date,
+        date: getUnixTime(parseISO(date)),
         payee,
         notes,
         userId: authUser.uid
@@ -114,7 +147,7 @@ class Expense extends Component {
         {
           amount: parseFloat(amount),
           budgetId,
-          date,
+          date: getUnixTime(parseISO(date)),
           payee,
           notes
         },
@@ -190,13 +223,7 @@ class Expense extends Component {
             {!budgets.length ? (
               <p className="danger mt2 mb0">
                 You have no budgets for the selected month.{" "}
-                <a
-                  href={`/new/budget/${getYear(
-                    parseISO(expense.date)
-                  )}/${getMonth(parseISO(expense.date))}`}
-                >
-                  Create one?
-                </a>
+                <a href="/new/budget">Create one?</a>
               </p>
             ) : null}
           </div>
@@ -206,7 +233,7 @@ class Expense extends Component {
               type="date"
               id="date"
               name="date"
-              value={toDateInputValue(fromUnixTime(expense.date))}
+              value={expense.date}
               onChange={this.onDateChange}
               required
             />

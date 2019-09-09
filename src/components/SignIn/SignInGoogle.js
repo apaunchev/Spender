@@ -25,7 +25,7 @@ class SignInGoogle extends Component {
           { merge: true }
         );
         this.setState({ error: null });
-        this.props.history.push(ROUTES.DASHBOARD);
+        this.props.history.push(ROUTES.EXPENSES);
       })
       .catch(error => {
         this.setState({ error });

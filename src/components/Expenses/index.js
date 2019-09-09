@@ -1,13 +1,23 @@
-import { endOfMonth, fromUnixTime, getUnixTime, startOfMonth } from "date-fns";
+import {
+  endOfMonth,
+  format,
+  fromUnixTime,
+  getUnixTime,
+  startOfMonth
+} from "date-fns";
 import { chain, sumBy } from "lodash";
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { compose } from "recompose";
 import Blankslate from "../../components/Blankslate";
-import Bar from "../Bar";
+import { DATE_FORMAT_ISO } from "../../constants/formats";
 import MonthNav from "../MonthNav";
 import { withAuthorization, withAuthUser } from "../Session";
-import { formatAmountInCurrency, getTotalAmountFromArray } from "../utils";
-import { compose } from "recompose";
+import {
+  formatAmountInCurrency,
+  formatAmountInPercent,
+  getTotalAmountFromArray
+} from "../utils";
 
 class Expenses extends Component {
   state = {
@@ -92,14 +102,33 @@ class Expenses extends Component {
       budgets,
       expenses
     } = this.state;
-    const { authUser } = this.props;
+    const {
+      authUser: { currency }
+    } = this.props;
 
     if (loadingExpenses || loadingBudgets) {
       return null;
     }
 
-    const leftToSpend = sumBy(budgets, "amount") - sumBy(expenses, "amount");
-
+    const totalPlanned = sumBy(budgets, "amount");
+    const totalSpent = sumBy(expenses, "amount");
+    const leftToSpend = totalPlanned - totalSpent;
+    let leftToSpendCumulative = totalPlanned;
+    const expensesByDate = chain(expenses)
+      .sortBy(e => e.date)
+      .map(e => {
+        const { name, color } = budgets.find(b => b.id === e.budgetId) || {};
+        leftToSpendCumulative = leftToSpendCumulative - e.amount;
+        return {
+          ...e,
+          budgetName: name,
+          budgetColor: color,
+          leftToSpendCumulative
+        };
+      })
+      .sortBy(e => -e.date)
+      .groupBy(e => fromUnixTime(e.date).toLocaleDateString())
+      .value();
     const expensesByBudget = chain(expenses)
       .groupBy("budgetId")
       .map((b, idx) => {
@@ -133,69 +162,122 @@ class Expenses extends Component {
         </header>
         {expenses.length ? (
           <>
-            <Bar data={expensesByBudget} currency={authUser.currency} />
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Budget</th>
-                  <th>Payee</th>
-                  <th className="tar">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {expenses.map(expense => {
-                  const budget =
-                    budgets.find(b => b.id === expense.budgetId) || {};
-
-                  return (
-                    <tr key={expense.id}>
-                      <td data-label="Date">
-                        <Link
-                          to={{
-                            pathname: `/expense/${expense.id}`,
-                            state: { expense, budgets }
-                          }}
-                        >
-                          {new Date(
-                            fromUnixTime(expense.date)
-                          ).toLocaleDateString()}
-                        </Link>
-                      </td>
-                      <td data-label="Budget">
-                        <span
-                          className="color-pill"
-                          style={{
-                            backgroundColor: budget.color
-                          }}
-                        />
-                        {budget.name}
-                      </td>
-                      <td data-label="Payee">{expense.payee || "–"}</td>
-                      <td data-label="Amount" className="tar">
-                        {formatAmountInCurrency(
-                          expense.amount,
-                          authUser.currency
+            <div className="chart">
+              <ol className="legend">
+                {expensesByBudget.map(({ id, name, color, amount }) => (
+                  <li key={id}>
+                    <span
+                      className="color-pill"
+                      style={{
+                        backgroundColor: color || "#212121"
+                      }}
+                    />
+                    <span>
+                      {name} - {formatAmountInCurrency(amount, currency)}{" "}
+                      <small>
+                        (
+                        {formatAmountInPercent(
+                          (amount / getTotalAmountFromArray(expensesByBudget)) *
+                            100
                         )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th colSpan="3" className="tar">
-                    Total
-                  </th>
-                  <td data-label="Total" className="tar bold">
-                    {formatAmountInCurrency(
-                      getTotalAmountFromArray(expenses),
-                      authUser.currency
-                    )}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
+                        )
+                      </small>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <div className="scale">
+                <span>
+                  {formatAmountInCurrency(totalSpent, currency)} spent
+                </span>
+                <span>
+                  {formatAmountInCurrency(leftToSpend, currency)} left
+                </span>
+              </div>
+              <div className="bar">
+                {expensesByBudget.map(({ id, color, amount }) => (
+                  <div
+                    key={id}
+                    className="bar__segment"
+                    style={{
+                      backgroundColor: color,
+                      width: formatAmountInPercent(
+                        (amount / getTotalAmountFromArray(expensesByBudget)) *
+                          100
+                      )
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="expenses">
+              {Object.keys(expensesByDate).map((date, idx) => {
+                return (
+                  <div key={`group-${idx}`} className="expenses-group">
+                    <h5 className="expenses-title">{date}</h5>
+                    <ol className="expenses-list">
+                      {expensesByDate[date].map(expense => {
+                        return (
+                          <li key={expense.id} className="expense">
+                            <Link
+                              to={{
+                                pathname: `/expense/${expense.id}`,
+                                state: {
+                                  expense: {
+                                    ...expense,
+                                    date: format(
+                                      fromUnixTime(expense.date),
+                                      DATE_FORMAT_ISO
+                                    )
+                                  },
+                                  budgets
+                                }
+                              }}
+                            >
+                              <div className="expense-left">
+                                <span className="semibold">
+                                  {expense.note || "Expense"}{" "}
+                                  {expense.payee ? (
+                                    <>
+                                      <span className="meta">@</span>
+                                      {expense.payee}
+                                    </>
+                                  ) : null}
+                                </span>
+                                <small className="flex">
+                                  <span
+                                    className="color-pill"
+                                    style={{
+                                      backgroundColor: expense.budgetColor
+                                    }}
+                                  />
+                                  {expense.budgetName}
+                                </small>
+                              </div>
+                              <div className="expense-right">
+                                <span className="semibold">
+                                  -
+                                  {formatAmountInCurrency(
+                                    expense.amount,
+                                    currency
+                                  )}
+                                </span>
+                                <small className="meta">
+                                  {formatAmountInCurrency(
+                                    expense.leftToSpendCumulative,
+                                    currency
+                                  )}
+                                </small>
+                              </div>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </div>
+                );
+              })}
+            </div>
           </>
         ) : (
           <Blankslate

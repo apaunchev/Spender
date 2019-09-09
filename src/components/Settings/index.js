@@ -28,7 +28,7 @@ class Settings extends Component {
     firebase
       .user(authUser.uid)
       .set({ currency }, { merge: true })
-      .then(() => (window.location.href = ROUTES.DASHBOARD));
+      .then(() => (window.location.href = ROUTES.EXPENSES));
   };
 
   render() {

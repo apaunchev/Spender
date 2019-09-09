@@ -74,11 +74,22 @@ class Clone extends Component {
         )}. Do you want to proceed?`
       )
     ) {
-      budgetsToClone.forEach(b => {
-        firebase.expenses().add({ ...b });
+      const batch = firebase.db.batch();
+
+      budgetsToClone.forEach(({ name, date, amount, color, userId }) => {
+        batch.set(firebase.budgets().doc(), {
+          name,
+          date,
+          amount,
+          color,
+          userId
+        });
       });
 
-      history.push("/dashboard");
+      batch
+        .commit()
+        .then(() => history.push("/"))
+        .catch(error => console.error(error));
     }
   };
 

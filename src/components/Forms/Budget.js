@@ -23,7 +23,7 @@ class Budget extends Component {
   componentDidMount() {
     const {
       match: {
-        params: { id, year, month }
+        params: { id }
       },
       firebase
     } = this.props;
@@ -39,23 +39,20 @@ class Budget extends Component {
         .then(doc => {
           if (doc.exists) {
             const { name, date, amount, color } = doc.data();
+
             this.setState({
-              currentDate: fromUnixTime(date),
               budget: {
                 name,
                 amount,
                 color
-              }
+              },
+              currentDate: fromUnixTime(date)
             });
           }
 
           this.setState({ loading: false });
         })
         .catch(error => console.error(error));
-    }
-
-    if (year && month) {
-      this.setState({ currentDate: new Date(year, month, 1) });
     }
   }
 
@@ -80,8 +77,8 @@ class Budget extends Component {
     event.preventDefault();
 
     const {
-      currentDate,
-      budget: { name, amount, color }
+      budget: { name, amount, color },
+      currentDate
     } = this.state;
     const {
       match: {
@@ -136,7 +133,7 @@ class Budget extends Component {
         params: { id }
       }
     } = this.props;
-    const { loading, currentDate, budget } = this.state;
+    const { loading, budget, currentDate } = this.state;
 
     if (loading || !budget) {
       return null;

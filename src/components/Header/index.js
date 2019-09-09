@@ -17,9 +17,8 @@ const Header = ({ firebase }) => {
           {authUser =>
             authUser ? (
               <>
-                <Link to="/dashboard">Spender</Link>
+                <Link to="/expenses">Spender</Link>
                 <nav>
-                  <Link to="/expenses">Expenses</Link>
                   <Link to="/budgets">Budgets</Link>
                   <Link to="/settings">Settings</Link>
                   <a href="/" onClick={doSignOut}>

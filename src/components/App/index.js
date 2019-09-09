@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import * as ROUTES from "../../constants/routes";
 import Budgets from "../Budgets";
 import Clone from "../Clone";
-import Dashboard from "../Dashboard";
 import Expenses from "../Expenses";
 import Footer from "../Footer";
 import Budget from "../Forms/Budget";
@@ -19,8 +18,6 @@ const App = () => (
     <Header />
     <Switch>
       <Route exact path={ROUTES.INTRO} component={Intro} />
-      <Route exact path={ROUTES.DASHBOARD} component={Dashboard} />
-      <Route exact path={ROUTES.SETTINGS} component={Settings} />
 
       <Route exact path={ROUTES.EXPENSES} component={Expenses} />
       <Route exact path={ROUTES.NEW_EXPENSE} component={Expense} />
@@ -30,6 +27,8 @@ const App = () => (
       <Route exact path={ROUTES.NEW_BUDGET} component={Budget} />
       <Route exact path={ROUTES.EDIT_BUDGET} component={Budget} />
       <Route exact path={ROUTES.CLONE_BUDGET} component={Clone} />
+
+      <Route exact path={ROUTES.SETTINGS} component={Settings} />
 
       <Route component={NoMatch} />
     </Switch>
