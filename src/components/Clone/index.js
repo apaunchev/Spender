@@ -29,8 +29,7 @@ class Clone extends Component {
       firebase
         .budgets()
         .where("userId", "==", authUser.uid)
-        .get()
-        .then(snapshot => {
+        .onSnapshot(snapshot => {
           if (snapshot.size) {
             let budgets = [];
             snapshot.forEach(doc =>
@@ -42,8 +41,7 @@ class Clone extends Component {
           }
 
           this.setState({ loading: false });
-        })
-        .catch(error => console.error(error));
+        });
     }
   }
 

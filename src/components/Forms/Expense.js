@@ -80,8 +80,7 @@ class Expense extends Component {
       .where("date", "<=", getUnixTime(endOfMonth(parseISO(currentDate))))
       .orderBy("date")
       .orderBy("name")
-      .get()
-      .then(snapshot => {
+      .onSnapshot(snapshot => {
         if (snapshot.size) {
           let budgets = [];
           snapshot.forEach(doc => budgets.push({ ...doc.data(), id: doc.id }));
@@ -91,8 +90,7 @@ class Expense extends Component {
         }
 
         this.setState({ loading: false });
-      })
-      .catch(error => console.error(error));
+      });
   }
 
   onInputChange = event => {

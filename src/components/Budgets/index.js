@@ -45,8 +45,7 @@ class Budgets extends Component {
       .where("userId", "==", authUser.uid)
       .where("date", ">=", getUnixTime(startOfMonth(currentDate)))
       .where("date", "<=", getUnixTime(endOfMonth(currentDate)))
-      .get()
-      .then(snapshot => {
+      .onSnapshot(snapshot => {
         if (snapshot.size) {
           let expenses = [];
           snapshot.forEach(doc => expenses.push({ ...doc.data(), id: doc.id }));
@@ -56,8 +55,7 @@ class Budgets extends Component {
         }
 
         this.setState({ loadingExpenses: false });
-      })
-      .catch(error => console.error(error));
+      });
   }
 
   fetchBudgets(currentDate) {
@@ -70,8 +68,7 @@ class Budgets extends Component {
       .where("userId", "==", authUser.uid)
       .where("date", ">=", getUnixTime(startOfMonth(currentDate)))
       .where("date", "<=", getUnixTime(endOfMonth(currentDate)))
-      .get()
-      .then(snapshot => {
+      .onSnapshot(snapshot => {
         if (snapshot.size) {
           let budgets = [];
           snapshot.forEach(doc => budgets.push({ ...doc.data(), id: doc.id }));
@@ -81,8 +78,7 @@ class Budgets extends Component {
         }
 
         this.setState({ loadingBudgets: false });
-      })
-      .catch(error => console.error(error));
+      });
   }
 
   setCurrentDate = currentDate => {
