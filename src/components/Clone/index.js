@@ -5,6 +5,7 @@ import { compose } from "recompose";
 import { DATE_FORMAT_HUMAN, DATE_FORMAT_ISO } from "../../constants/formats";
 import { withFirebase } from "../Firebase";
 import { withAuthUser } from "../Session";
+import Loading from "../Loading";
 
 class Clone extends Component {
   state = {
@@ -95,7 +96,7 @@ class Clone extends Component {
     const { loading, currentDate, cloneFromMonth, budgets } = this.state;
 
     if (loading) {
-      return null;
+      return <Loading isCenter={true} />;
     }
 
     const getAvailableMonthsFromBudgets = budgets

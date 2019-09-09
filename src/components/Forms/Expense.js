@@ -11,6 +11,7 @@ import { compose } from "recompose";
 import { DATE_FORMAT_ISO } from "../../constants/formats";
 import { withFirebase } from "../Firebase";
 import { withAuthUser } from "../Session/context";
+import Loading from "../Loading";
 
 class Expense extends Component {
   state = {
@@ -180,7 +181,7 @@ class Expense extends Component {
     const { loading, expense, budgets } = this.state;
 
     if (loading) {
-      return null;
+      return <Loading isCenter={true} />;
     }
 
     return (

@@ -7,6 +7,7 @@ import MonthNav from "../MonthNav";
 import { withAuthUser } from "../Session";
 import { renderDatalistFromArray } from "../utils";
 import { compose } from "recompose";
+import Loading from "../Loading";
 
 class Budget extends Component {
   state = {
@@ -137,8 +138,8 @@ class Budget extends Component {
     } = this.props;
     const { loading, budget, currentDate } = this.state;
 
-    if (loading || !budget) {
-      return null;
+    if (loading) {
+      return <Loading isCenter={true} />;
     }
 
     return (

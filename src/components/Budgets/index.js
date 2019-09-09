@@ -18,6 +18,7 @@ import {
   formatAmountInPercent,
   getTotalAmountFromArray
 } from "../utils";
+import Loading from "../Loading";
 
 class Budgets extends Component {
   state = {
@@ -98,7 +99,7 @@ class Budgets extends Component {
     const { authUser } = this.props;
 
     if (loadingExpenses || loadingBudgets) {
-      return null;
+      return <Loading isCenter={true} />;
     }
 
     const formattedBudgets = chain(budgets)

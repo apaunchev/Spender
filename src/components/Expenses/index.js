@@ -18,6 +18,7 @@ import {
   formatAmountInPercent,
   getTotalAmountFromArray
 } from "../utils";
+import Loading from "../Loading";
 
 class Expenses extends Component {
   state = {
@@ -103,7 +104,7 @@ class Expenses extends Component {
     } = this.props;
 
     if (loadingExpenses || loadingBudgets) {
-      return null;
+      return <Loading isCenter={true} />;
     }
 
     const totalPlanned = sumBy(budgets, "amount");
