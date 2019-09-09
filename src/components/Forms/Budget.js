@@ -29,7 +29,7 @@ class Budget extends Component {
     } = this.props;
     const { budget } = this.state;
 
-    if (id && !budget) {
+    if (id && !budget.name) {
       this.setState({ loading: true });
 
       // read
@@ -41,7 +41,9 @@ class Budget extends Component {
             const { name, date, amount, color } = doc.data();
 
             this.setState({
+              ...this.state,
               budget: {
+                ...this.state.budget,
                 name,
                 amount,
                 color

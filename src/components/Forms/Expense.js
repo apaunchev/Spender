@@ -2,6 +2,7 @@ import {
   endOfMonth,
   format,
   getUnixTime,
+  fromUnixTime,
   parseISO,
   startOfMonth
 } from "date-fns";
@@ -38,7 +39,7 @@ class Expense extends Component {
       this.fetchBudgets(expense.date);
     }
 
-    if (id && !expense) {
+    if (id && !expense.amount) {
       this.setState({ loading: true });
 
       // read
@@ -51,9 +52,10 @@ class Expense extends Component {
 
             this.setState({
               expense: {
+                ...this.state.expense,
                 amount,
                 budgetId,
-                date,
+                date: format(fromUnixTime(date), DATE_FORMAT_ISO),
                 payee,
                 notes
               }
