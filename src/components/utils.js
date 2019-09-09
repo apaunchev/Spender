@@ -1,9 +1,3 @@
-import {
-  endOfMonth,
-  fromUnixTime,
-  isWithinInterval,
-  startOfMonth
-} from "date-fns";
 import React from "react";
 
 export const getTotalAmountFromArray = (arr, field = "amount") => {
@@ -54,9 +48,3 @@ export const toDateInputValue = date => {
   local.setMinutes(date.getMinutes() - date.getTimezoneOffset());
   return local.toJSON().slice(0, 10);
 };
-
-export const isUnixDateWithinMonth = (item, date) =>
-  isWithinInterval(fromUnixTime(item.date), {
-    start: startOfMonth(date),
-    end: endOfMonth(date)
-  });
