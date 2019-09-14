@@ -100,6 +100,10 @@ main > section {
     padding: 1rem;
   }
 
+  main {
+    margin: 1.5rem 0;
+  }
+
   hr {
     margin: 2rem 0;
   }
@@ -131,15 +135,8 @@ main > section {
 
 @media (max-width: 600px) {
   .header {
+    position: relative;
     margin-bottom: 1.5rem;
-  }
-
-  .header-inner {
-    display: block;
-  }
-
-  .header nav {
-    margin-top: 1rem;
   }
 }
 
@@ -377,7 +374,6 @@ input[type="submit"],
   border-radius: 0;
   border-bottom: 2px solid var(--border);
   font: inherit;
-  -webkit-appearance: caret;
 }
 
 .form-input select:focus,
