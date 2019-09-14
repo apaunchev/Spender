@@ -163,7 +163,6 @@ class Budget extends Component {
               value={budget.name}
               onChange={this.onInputChange}
               required
-              autoFocus
             />
           </div>
           <div className="form-input">
