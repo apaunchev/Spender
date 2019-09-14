@@ -123,7 +123,7 @@ class Expenses extends Component {
           leftToSpendCumulative
         };
       })
-      .sortBy(e => -e.date)
+      .sortBy(e => e.leftToSpendCumulative)
       .groupBy(e => fromUnixTime(e.date).toLocaleDateString())
       .value();
     const expensesByBudget = chain(expenses)
