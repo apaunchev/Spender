@@ -310,9 +310,9 @@ main > section {
 .button,
 button,
 input[type="submit"] {
-  padding: 0.25em 0.75em;
-  background-color: var(--text);
-  color: var(--background);
+  padding: 0.5em 1em;
+  background-color: var(--inputBackground);
+  color: var(--text);
   text-align: center;
   text-decoration: none;
   border: none;
@@ -325,24 +325,24 @@ input[type="submit"] {
 
 .button:hover,
 button:hover {
-  background-color: var(--text);
-  color: var(--background);
-  text-decoration: underline;
+  background-color: var(--inputFocus);
+  color: var(--text);
+  text-decoration: none;
 }
 
 input[type="submit"],
 .button--primary,
 .button--primary:hover {
+  color: white;
   background-color: var(--accent);
 }
 
 .button-group {
-  display: flex;
+  display: inline-flex;
 }
 
 .button-group .button {
   flex: 1 1 auto;
-  margin: 0 0.1rem;
 }
 
 /* Forms */
