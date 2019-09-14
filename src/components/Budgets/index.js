@@ -112,20 +112,18 @@ class Budgets extends Component {
 
     return (
       <main>
-        <header className="mb3 flex flex--between">
-          <div>
-            <h1 className="mb0">Budgets</h1>
-            <nav className="nav nav--small">
-              <Link to={{ pathname: "/new/budget", state: { currentDate } }}>
-                New budget
-              </Link>
-              <Link
-                to={`/clone/${getYear(currentDate)}/${getMonth(currentDate)}`}
-              >
-                Clone budgets
-              </Link>
-            </nav>
-          </div>
+        <header className="mb3">
+          <h1 className="mb0">Budgets</h1>
+          <nav className="nav mb3">
+            <Link to={{ pathname: "/new/budget", state: { currentDate } }}>
+              New budget
+            </Link>
+            <Link
+              to={`/clone/${getYear(currentDate)}/${getMonth(currentDate)}`}
+            >
+              Clone budgets
+            </Link>
+          </nav>
           <MonthNav
             currentDate={currentDate}
             setCurrentDate={this.setCurrentDate}

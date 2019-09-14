@@ -144,8 +144,8 @@ class Budget extends Component {
 
     return (
       <main>
-        <header className="mb3 flex flex--between">
-          <h1 className="mb0">{!id ? "New" : "Edit"} budget</h1>
+        <header className="mb3">
+          <h1>{!id ? "New" : "Edit"} budget</h1>
           <MonthNav
             currentDate={currentDate}
             setCurrentDate={this.setCurrentDate}

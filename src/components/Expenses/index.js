@@ -143,15 +143,13 @@ class Expenses extends Component {
 
     return (
       <main>
-        <header className="mb3 flex flex--between">
-          <div>
-            <h1 className="mb0">Expenses</h1>
-            <nav>
-              <Link to={{ pathname: "/new/expense", state: { budgets } }}>
-                New expense
-              </Link>
-            </nav>
-          </div>
+        <header className="mb3">
+          <h1 className="mb0">Expenses</h1>
+          <nav className="mb3">
+            <Link to={{ pathname: "/new/expense", state: { budgets } }}>
+              New expense
+            </Link>
+          </nav>
           <MonthNav
             currentDate={currentDate}
             setCurrentDate={this.setCurrentDate}
