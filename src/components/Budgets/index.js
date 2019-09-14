@@ -13,11 +13,7 @@ import Blankslate from "../../components/Blankslate";
 import MonthNav from "../MonthNav";
 import { withAuthorization } from "../Session";
 import { withAuthUser } from "../Session/context";
-import {
-  formatAmountInCurrency,
-  formatAmountInPercent,
-  getTotalAmountFromArray
-} from "../utils";
+import { formatAmountInCurrency, getTotalAmountFromArray } from "../utils";
 import Loading from "../Loading";
 
 class Budgets extends Component {
@@ -177,9 +173,7 @@ class Budgets extends Component {
                       <span
                         className="bar__segment"
                         style={{
-                          width: `${formatAmountInPercent(
-                            (budget.current / budget.amount) * 100
-                          )}`
+                          width: `${(budget.current / budget.amount) * 100}%`
                         }}
                       ></span>
                     </div>

@@ -196,10 +196,9 @@ class Expenses extends Component {
                     className="bar__segment"
                     style={{
                       backgroundColor: color,
-                      width: formatAmountInPercent(
-                        (amount / getTotalAmountFromArray(expensesByBudget)) *
-                          100
-                      )
+                      width: `${(amount /
+                        getTotalAmountFromArray(expensesByBudget)) *
+                        100}%`
                     }}
                   />
                 ))}
