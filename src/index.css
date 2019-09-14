@@ -78,10 +78,6 @@ mark {
   outline: 3px solid var(--highlight);
 }
 
-th {
-  text-align: left;
-}
-
 hr {
   border: 0;
   clear: both;
