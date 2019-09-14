@@ -188,6 +188,10 @@ main > section {
   box-shadow: inset 0 0 0 1px var(--inputBackground);
 }
 
+.bar__segment:only-child {
+  min-width: 0;
+}
+
 .bar__segment + .bar__segment {
   border-left: 2px solid var(--background);
 }
