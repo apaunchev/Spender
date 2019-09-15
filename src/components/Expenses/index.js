@@ -125,6 +125,10 @@ class Expenses extends Component {
       })
       .sortBy(e => e.leftToSpendCumulative)
       .groupBy(e => fromUnixTime(e.date).toLocaleDateString())
+      .mapValues(g => ({
+        expenses: [...g],
+        total: getTotalAmountFromArray([...g])
+      }))
       .value();
     const expensesByBudget = chain(expenses)
       .groupBy("budgetId")
@@ -208,65 +212,73 @@ class Expenses extends Component {
               {Object.keys(expensesByDate).map((date, idx) => {
                 return (
                   <div key={`group-${idx}`} className="expenses-group">
-                    <h5 className="expenses-title">{date}</h5>
+                    <h5 className="expenses-title">
+                      <strong>{date}</strong>
+                      <strong>
+                        {formatAmountInCurrency(
+                          expensesByDate[date].total,
+                          currency
+                        )}
+                      </strong>
+                    </h5>
                     <ol className="expenses-list">
-                      {expensesByDate[date].map(expense => {
-                        return (
-                          <li key={expense.id} className="expense">
-                            <Link
-                              to={{
-                                pathname: `/expense/${expense.id}`,
-                                state: {
-                                  expense: {
-                                    ...expense,
-                                    date: format(
-                                      fromUnixTime(expense.date),
-                                      DATE_FORMAT_ISO
-                                    )
-                                  },
-                                  budgets
-                                }
-                              }}
-                            >
-                              <div className="expense-left">
-                                <span className="semibold">
-                                  {expense.note || "Expense"}{" "}
-                                  {expense.payee ? (
-                                    <>
-                                      <span className="meta">@</span>
-                                      {expense.payee}
-                                    </>
-                                  ) : null}
-                                </span>
-                                <small className="flex">
-                                  <span
-                                    className="color-pill"
-                                    style={{
-                                      backgroundColor: expense.budgetColor
-                                    }}
-                                  />
-                                  {expense.budgetName}
-                                </small>
-                              </div>
-                              <div className="expense-right">
-                                <span className="semibold">
-                                  -
-                                  {formatAmountInCurrency(
-                                    expense.amount,
-                                    currency
-                                  )}
-                                </span>
-                                <small className="meta">
-                                  {formatAmountInCurrency(
-                                    expense.leftToSpendCumulative,
-                                    currency
-                                  )}
-                                </small>
-                              </div>
-                            </Link>
-                          </li>
-                        );
-                      })}
+                      {expensesByDate[date].expenses &&
+                        expensesByDate[date].expenses.map(expense => {
+                          return (
+                            <li key={expense.id} className="expense">
+                              <Link
+                                to={{
+                                  pathname: `/expense/${expense.id}`,
+                                  state: {
+                                    expense: {
+                                      ...expense,
+                                      date: format(
+                                        fromUnixTime(expense.date),
+                                        DATE_FORMAT_ISO
+                                      )
+                                    },
+                                    budgets
+                                  }
+                                }}
+                              >
+                                <div className="expense-left">
+                                  <span className="semibold">
+                                    {expense.note || "Expense"}{" "}
+                                    {expense.payee ? (
+                                      <>
+                                        <span className="meta">@</span>
+                                        {expense.payee}
+                                      </>
+                                    ) : null}
+                                  </span>
+                                  <small className="flex">
+                                    <span
+                                      className="color-pill"
+                                      style={{
+                                        backgroundColor: expense.budgetColor
+                                      }}
+                                    />
+                                    {expense.budgetName}
+                                  </small>
+                                </div>
+                                <div className="expense-right">
+                                  <span className="semibold">
+                                    {formatAmountInCurrency(
+                                      expense.amount,
+                                      currency
+                                    )}
+                                  </span>
+                                  <small className="meta">
+                                    {formatAmountInCurrency(
+                                      expense.leftToSpendCumulative,
+                                      currency
+                                    )}
+                                  </small>
+                                </div>
+                              </Link>
+                            </li>
+                          );
+                        })}
                     </ol>
                   </div>
                 );
