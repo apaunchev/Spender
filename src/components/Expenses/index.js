@@ -130,20 +130,24 @@ class Expenses extends Component {
         total: getTotalAmountFromArray([...g])
       }))
       .value();
-    const expensesByBudget = chain(expenses)
+
+    let expensesByBudget = chain(expenses)
       .groupBy("budgetId")
       .map((b, idx) => {
         const { id, name, color } = budgets.find(b => b.id === idx) || {};
         return { id, name, color, amount: sumBy(b, "amount") };
       })
       .sortBy(b => -b.amount)
-      .push({
+      .value();
+
+    if (leftToSpend > 0) {
+      expensesByBudget.push({
         id: "_left",
         name: "Left to spend or save",
         color: "rgba(0, 0, 0, 0.05)",
         amount: leftToSpend
-      })
-      .value();
+      });
+    }
 
     return (
       <main>
