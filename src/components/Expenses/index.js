@@ -109,7 +109,7 @@ class Expenses extends Component {
 
     const totalPlanned = sumBy(budgets, "amount");
     const totalSpent = sumBy(expenses, "amount");
-    const leftToSpend = totalPlanned - totalSpent;
+    const leftToSpend = Math.max(0, totalPlanned - totalSpent);
     let leftToSpendCumulative = totalPlanned;
     const expensesByDate = chain(expenses)
       .sortBy(e => e.date)
