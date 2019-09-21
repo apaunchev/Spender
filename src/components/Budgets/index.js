@@ -37,7 +37,7 @@ class Budgets extends Component {
 
     this.setState({ loadingExpenses: true });
 
-    return firebase
+    this.unsubscribeExpenses = firebase
       .expenses()
       .where("userId", "==", authUser.uid)
       .where("date", ">=", getUnixTime(startOfMonth(currentDate)))
@@ -60,7 +60,7 @@ class Budgets extends Component {
 
     this.setState({ loadingBudgets: true });
 
-    return firebase
+    this.unsubscribeBudgets = firebase
       .budgets()
       .where("userId", "==", authUser.uid)
       .where("date", ">=", getUnixTime(startOfMonth(currentDate)))
@@ -78,10 +78,19 @@ class Budgets extends Component {
       });
   }
 
+  componentWillUnmount() {
+    this.unsubscribeExpenses();
+    this.unsubscribeBudgets();
+  }
+
   setCurrentDate = currentDate => {
-    this.setState({ currentDate });
-    this.fetchExpenses(currentDate);
-    this.fetchBudgets(currentDate);
+    this.unsubscribeExpenses();
+    this.unsubscribeBudgets();
+
+    this.setState({ currentDate }, () => {
+      this.fetchExpenses(currentDate);
+      this.fetchBudgets(currentDate);
+    });
   };
 
   render() {

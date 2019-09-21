@@ -27,7 +27,7 @@ class Clone extends Component {
     if (year && month) {
       this.setState({ currentDate: new Date(year, month, 1), loading: true });
 
-      firebase
+      this.unsubscribe = firebase
         .budgets()
         .where("userId", "==", authUser.uid)
         .onSnapshot(snapshot => {
@@ -44,6 +44,10 @@ class Clone extends Component {
           this.setState({ loading: false });
         });
     }
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
   onSubmit = event => {

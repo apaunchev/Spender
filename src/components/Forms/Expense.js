@@ -74,7 +74,7 @@ class Expense extends Component {
 
     this.setState({ loading: true });
 
-    return firebase
+    this.unsubscribe = firebase
       .budgets()
       .where("userId", "==", authUser.uid)
       .where("date", ">=", getUnixTime(startOfMonth(parseISO(currentDate))))
@@ -92,6 +92,10 @@ class Expense extends Component {
 
         this.setState({ loading: false });
       });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe && this.unsubscribe();
   }
 
   onInputChange = event => {
