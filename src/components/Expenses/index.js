@@ -247,9 +247,10 @@ class Expenses extends Component {
                               >
                                 <div className="expense-left">
                                   <span className="semibold">
-                                    {expense.note || "Expense"}{" "}
+                                    {expense.notes}
                                     {expense.payee ? (
                                       <>
+                                        {" "}
                                         <span className="meta">@</span>
                                         {expense.payee}
                                       </>
