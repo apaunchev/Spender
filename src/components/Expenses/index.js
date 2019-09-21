@@ -207,10 +207,11 @@ class Expenses extends Component {
                 </span>
               </div>
               <div className="bar">
-                {expensesByBudget.map(({ id, color, amount }) => (
+                {expensesByBudget.map(({ id, name, color, amount }) => (
                   <div
                     key={id}
                     className="bar__segment"
+                    title={name}
                     style={{
                       backgroundColor: color,
                       width: `${(amount /
