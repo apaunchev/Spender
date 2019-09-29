@@ -1,11 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import * as ROUTES from "../../constants/routes";
-import Budgets from "../Budgets";
-import Clone from "../Clone";
+import Categories from "../Categories";
 import Expenses from "../Expenses";
 import Footer from "../Footer";
-import Budget from "../Forms/Budget";
+import Category from "../Forms/Category";
 import Expense from "../Forms/Expense";
 import Header from "../Header";
 import Intro from "../Intro";
@@ -23,10 +22,9 @@ const App = () => (
       <Route exact path={ROUTES.NEW_EXPENSE} component={Expense} />
       <Route exact path={ROUTES.EDIT_EXPENSE} component={Expense} />
 
-      <Route exact path={ROUTES.BUDGETS} component={Budgets} />
-      <Route exact path={ROUTES.NEW_BUDGET} component={Budget} />
-      <Route exact path={ROUTES.EDIT_BUDGET} component={Budget} />
-      <Route exact path={ROUTES.CLONE_BUDGET} component={Clone} />
+      <Route exact path={ROUTES.CATEGORIES} component={Categories} />
+      <Route exact path={ROUTES.NEW_CATEGORY} component={Category} />
+      <Route exact path={ROUTES.EDIT_CATEGORY} component={Category} />
 
       <Route exact path={ROUTES.SETTINGS} component={Settings} />
 

@@ -42,9 +42,3 @@ export const renderDatalistFromArray = (arr, name) => (
     ))}
   </datalist>
 );
-
-export const toDateInputValue = date => {
-  const local = new Date(date);
-  local.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  return local.toJSON().slice(0, 10);
-};

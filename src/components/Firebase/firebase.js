@@ -58,9 +58,9 @@ class Firebase {
   user = id => this.db.doc(`users/${id}`);
   users = () => this.db.collection("users");
 
-  // Budgets API
-  budget = id => this.db.doc(`budgets/${id}`);
-  budgets = () => this.db.collection("budgets");
+  // Categories API
+  category = id => this.db.doc(`categories/${id}`);
+  categories = () => this.db.collection("categories");
 
   // Expenses API
   expense = id => this.db.doc(`expenses/${id}`);

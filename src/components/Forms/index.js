@@ -1,4 +1,4 @@
 import Expense from "./Expense";
-import Budget from "./Budget";
+import Category from "./Category";
 
-export { Expense, Budget };
+export { Expense, Category };

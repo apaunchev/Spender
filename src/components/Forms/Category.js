@@ -1,23 +1,20 @@
-import { fromUnixTime, getUnixTime, startOfMonth } from "date-fns";
+import { getUnixTime } from "date-fns";
 import React, { Component } from "react";
 import { CirclePicker } from "react-color";
-import BUDGET_NAMES from "../../constants/budgets";
+import CATEGORY_NAMES from "../../constants/categories";
 import { withFirebase } from "../Firebase";
-import MonthNav from "../MonthNav";
 import { withAuthUser } from "../Session";
 import { renderDatalistFromArray } from "../utils";
 import { compose } from "recompose";
 import Loading from "../Loading";
 
-class Budget extends Component {
+class Category extends Component {
   state = {
     loading: false,
-    budget: {
+    category: {
       name: "",
-      amount: "",
       color: "#000000"
     },
-    currentDate: new Date(),
     ...this.props.location.state
   };
 
@@ -28,28 +25,26 @@ class Budget extends Component {
       },
       firebase
     } = this.props;
-    const { budget } = this.state;
+    const { category } = this.state;
 
-    if (id && !budget.name) {
+    if (id && !category.name) {
       this.setState({ loading: true });
 
       // read
       firebase
-        .budget(id)
+        .category(id)
         .get()
         .then(doc => {
           if (doc.exists) {
-            const { name, date, amount, color } = doc.data();
+            const { name, color } = doc.data();
 
             this.setState({
               ...this.state,
-              budget: {
-                ...this.state.budget,
+              category: {
+                ...this.state.category,
                 name,
-                amount,
                 color
-              },
-              currentDate: fromUnixTime(date)
+              }
             });
           }
 
@@ -59,18 +54,14 @@ class Budget extends Component {
     }
   }
 
-  setCurrentDate = currentDate => {
-    this.setState({ currentDate });
-  };
-
   onInputChange = event => {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
     const name = target.name;
 
     this.setState({
-      budget: {
-        ...this.state.budget,
+      category: {
+        ...this.state.category,
         [name]: value
       }
     });
@@ -80,8 +71,7 @@ class Budget extends Component {
     event.preventDefault();
 
     const {
-      budget: { name, amount, color },
-      currentDate
+      category: { name, color }
     } = this.state;
     const {
       match: {
@@ -94,27 +84,24 @@ class Budget extends Component {
 
     if (!id) {
       // create
-      firebase.budgets().add({
+      firebase.categories().add({
         name,
-        date: getUnixTime(startOfMonth(currentDate)),
-        amount: parseFloat(amount),
+        createdAt: getUnixTime(new Date()),
         color,
         userId: authUser.uid
       });
     } else {
       // update
-      firebase.budget(id).set(
+      firebase.category(id).set(
         {
           name,
-          date: getUnixTime(startOfMonth(currentDate)),
-          amount: parseFloat(amount),
           color
         },
         { merge: true }
       );
     }
 
-    history.push("/budgets");
+    history.push("/categories");
   };
 
   onDelete = (event, id) => {
@@ -122,12 +109,12 @@ class Budget extends Component {
 
     const { firebase, history } = this.props;
 
-    if (window.confirm("Are you sure you want to delete this budget?")) {
+    if (window.confirm("Are you sure you want to delete this category?")) {
       // delete
-      firebase.budget(id).delete();
+      firebase.category(id).delete();
     }
 
-    history.push("/budgets");
+    history.push("/categories");
   };
 
   render() {
@@ -136,7 +123,7 @@ class Budget extends Component {
         params: { id }
       }
     } = this.props;
-    const { loading, budget, currentDate } = this.state;
+    const { loading, category } = this.state;
 
     if (loading) {
       return <Loading isCenter={true} />;
@@ -145,11 +132,7 @@ class Budget extends Component {
     return (
       <main>
         <header className="mb3">
-          <h1>{!id ? "New" : "Edit"} budget</h1>
-          <MonthNav
-            currentDate={currentDate}
-            setCurrentDate={this.setCurrentDate}
-          />
+          <h1>{!id ? "New" : "Edit"} category</h1>
         </header>
         <form className="form" onSubmit={this.onSubmit}>
           <div className="form-input">
@@ -158,23 +141,9 @@ class Budget extends Component {
               type="text"
               id="name"
               name="name"
-              list="budgets"
+              list="categories"
               placeholder="Groceries"
-              value={budget.name}
-              onChange={this.onInputChange}
-              required
-            />
-          </div>
-          <div className="form-input">
-            <label htmlFor="amount">Amount</label>
-            <input
-              type="number"
-              id="amount"
-              name="amount"
-              min="0"
-              step="0.01"
-              placeholder="200"
-              value={budget.amount}
+              value={category.name}
               onChange={this.onInputChange}
               required
             />
@@ -183,10 +152,10 @@ class Budget extends Component {
             <label htmlFor="color">Color</label>
             <CirclePicker
               name="color"
-              color={budget.color}
+              color={category.color}
               onChangeComplete={color =>
                 this.setState({
-                  budget: { ...this.state.budget, color: color.hex }
+                  category: { ...this.state.category, color: color.hex }
                 })
               }
             />
@@ -206,7 +175,7 @@ class Budget extends Component {
             </p>
           )}
         </form>
-        {renderDatalistFromArray(BUDGET_NAMES, "budgets")}
+        {renderDatalistFromArray(CATEGORY_NAMES, "categories")}
       </main>
     );
   }
@@ -215,4 +184,4 @@ class Budget extends Component {
 export default compose(
   withAuthUser,
   withFirebase
-)(Budget);
+)(Category);

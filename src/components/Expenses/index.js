@@ -23,22 +23,21 @@ import Loading from "../Loading";
 class Expenses extends Component {
   state = {
     loadingExpenses: false,
-    loadingBudgets: false,
+    loadingCategories: false,
     currentDate: new Date(),
-    expenses: [],
-    budgets: []
+    expenses: []
   };
 
   componentDidMount() {
     const { currentDate } = this.state;
 
     this.fetchExpenses(currentDate);
-    this.fetchBudgets(currentDate);
+    this.fetchCategories();
   }
 
   componentWillUnmount() {
     this.unsubscribeExpenses();
-    this.unsubscribeBudgets();
+    this.unsubscribeCategories();
   }
 
   fetchExpenses(currentDate) {
@@ -65,74 +64,73 @@ class Expenses extends Component {
       });
   }
 
-  fetchBudgets(currentDate) {
+  fetchCategories() {
     const { firebase, authUser } = this.props;
 
-    this.setState({ loadingBudgets: true });
+    this.setState({ loadingCategories: true });
 
-    this.unsubscribeBudgets = firebase
-      .budgets()
+    this.unsubscribeCategories = firebase
+      .categories()
       .where("userId", "==", authUser.uid)
-      .where("date", ">=", getUnixTime(startOfMonth(currentDate)))
-      .where("date", "<=", getUnixTime(endOfMonth(currentDate)))
-      .orderBy("date")
       .orderBy("name")
       .onSnapshot(snapshot => {
         if (snapshot.size) {
-          let budgets = [];
-          snapshot.forEach(doc => budgets.push({ ...doc.data(), id: doc.id }));
-          this.setState({ budgets });
+          let categories = [];
+          snapshot.forEach(doc =>
+            categories.push({ ...doc.data(), id: doc.id })
+          );
+          this.setState({ categories });
         } else {
-          this.setState({ budgets: [] });
+          this.setState({ categories: [] });
         }
 
-        this.setState({ loadingBudgets: false });
+        this.setState({ loadingCategories: false });
       });
   }
 
   setCurrentDate = currentDate => {
     this.unsubscribeExpenses();
-    this.unsubscribeBudgets();
 
     this.setState({ currentDate }, () => {
       this.fetchExpenses(currentDate);
-      this.fetchBudgets(currentDate);
     });
   };
 
   render() {
     const {
       loadingExpenses,
-      loadingBudgets,
+      loadingCategories,
       currentDate,
-      budgets,
-      expenses
+      expenses,
+      categories
     } = this.state;
     const {
       authUser: { currency }
     } = this.props;
 
-    if (loadingExpenses || loadingBudgets) {
+    if (loadingExpenses || loadingCategories) {
       return <Loading isCenter={true} />;
     }
 
-    const totalPlanned = sumBy(budgets, "amount");
-    const totalSpent = sumBy(expenses, "amount");
-    const leftToSpend = Math.max(0, totalPlanned - totalSpent);
-    let leftToSpendCumulative = totalPlanned;
+    let expensesByCategory = chain(expenses)
+      .groupBy("categoryId")
+      .map((c, idx) => {
+        const { id, name, color } = categories.find(c => c.id === idx) || {};
+        return { id, name, color, amount: sumBy(c, "amount") };
+      })
+      .sortBy(c => -c.amount)
+      .value();
+
     const expensesByDate = chain(expenses)
-      .sortBy(e => e.date)
+      .sortBy(e => -e.date)
       .map(e => {
-        const { name, color } = budgets.find(b => b.id === e.budgetId) || {};
-        leftToSpendCumulative = leftToSpendCumulative - e.amount;
+        const category = categories.find(c => c.id === e.categoryId);
         return {
           ...e,
-          budgetName: name,
-          budgetColor: color,
-          leftToSpendCumulative
+          categoryName: category.name,
+          categoryColor: category.color
         };
       })
-      .sortBy(e => e.leftToSpendCumulative)
       .groupBy(e => fromUnixTime(e.date).toLocaleDateString())
       .mapValues(g => ({
         expenses: [...g],
@@ -140,32 +138,12 @@ class Expenses extends Component {
       }))
       .value();
 
-    let expensesByBudget = chain(expenses)
-      .groupBy("budgetId")
-      .map((b, idx) => {
-        const { id, name, color } = budgets.find(b => b.id === idx) || {};
-        return { id, name, color, amount: sumBy(b, "amount") };
-      })
-      .sortBy(b => -b.amount)
-      .value();
-
-    if (leftToSpend > 0) {
-      expensesByBudget.push({
-        id: "_left",
-        name: "Left to spend or save",
-        color: "rgba(0, 0, 0, 0.05)",
-        amount: leftToSpend
-      });
-    }
-
     return (
       <main>
         <header className="mb3">
           <h1 className="mb0">Expenses</h1>
           <nav className="mb3">
-            <Link to={{ pathname: "/new/expense", state: { budgets } }}>
-              New expense
-            </Link>
+            <Link to={{ pathname: "/new/expense" }}>New expense</Link>
           </nav>
           <MonthNav
             currentDate={currentDate}
@@ -176,7 +154,7 @@ class Expenses extends Component {
           <>
             <div className="chart">
               <ol className="legend">
-                {expensesByBudget.map(({ id, name, color, amount }) => (
+                {expensesByCategory.map(({ id, name, color, amount }) => (
                   <li key={id}>
                     <span
                       className="color-pill"
@@ -189,7 +167,8 @@ class Expenses extends Component {
                       <small>
                         (
                         {formatAmountInPercent(
-                          (amount / getTotalAmountFromArray(expensesByBudget)) *
+                          (amount /
+                            getTotalAmountFromArray(expensesByCategory)) *
                             100
                         )}
                         )
@@ -198,16 +177,8 @@ class Expenses extends Component {
                   </li>
                 ))}
               </ol>
-              <div className="scale">
-                <span>
-                  {formatAmountInCurrency(totalSpent, currency)} spent
-                </span>
-                <span>
-                  {formatAmountInCurrency(leftToSpend, currency)} left
-                </span>
-              </div>
               <div className="bar">
-                {expensesByBudget.map(({ id, name, color, amount }) => (
+                {expensesByCategory.map(({ id, name, color, amount }) => (
                   <div
                     key={id}
                     className="bar__segment"
@@ -215,7 +186,7 @@ class Expenses extends Component {
                     style={{
                       backgroundColor: color,
                       width: `${(amount /
-                        getTotalAmountFromArray(expensesByBudget)) *
+                        getTotalAmountFromArray(expensesByCategory)) *
                         100}%`
                     }}
                   />
@@ -237,32 +208,30 @@ class Expenses extends Component {
                     </h5>
                     <ol className="expenses-list">
                       {expensesByDate[date].expenses &&
-                        expensesByDate[date].expenses.map(expense => {
+                        expensesByDate[date].expenses.map(e => {
                           return (
-                            <li key={expense.id} className="expense">
+                            <li key={e.id} className="expense">
                               <Link
                                 to={{
-                                  pathname: `/expense/${expense.id}`,
+                                  pathname: `/expense/${e.id}`,
                                   state: {
                                     expense: {
-                                      ...expense,
+                                      ...e,
                                       date: format(
-                                        fromUnixTime(expense.date),
+                                        fromUnixTime(e.date),
                                         DATE_FORMAT_ISO
                                       )
-                                    },
-                                    budgets
+                                    }
                                   }
                                 }}
                               >
                                 <div className="expense-left">
                                   <span className="semibold">
-                                    {expense.notes}
-                                    {expense.payee ? (
+                                    {e.note}
+                                    {e.payee ? (
                                       <>
-                                        {" "}
-                                        <span className="meta">@</span>
-                                        {expense.payee}
+                                        <span className="meta"> @</span>
+                                        {e.payee}
                                       </>
                                     ) : null}
                                   </span>
@@ -270,25 +239,16 @@ class Expenses extends Component {
                                     <span
                                       className="color-pill"
                                       style={{
-                                        backgroundColor: expense.budgetColor
+                                        backgroundColor: e.categoryColor
                                       }}
                                     />
-                                    {expense.budgetName}
+                                    {e.categoryName}
                                   </small>
                                 </div>
                                 <div className="expense-right">
                                   <span className="semibold">
-                                    {formatAmountInCurrency(
-                                      expense.amount,
-                                      currency
-                                    )}
+                                    {formatAmountInCurrency(e.amount, currency)}
                                   </span>
-                                  <small className="meta">
-                                    {formatAmountInCurrency(
-                                      expense.leftToSpendCumulative,
-                                      currency
-                                    )}
-                                  </small>
                                 </div>
                               </Link>
                             </li>

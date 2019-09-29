@@ -19,7 +19,7 @@ const Header = ({ firebase }) => {
               <>
                 <Link to="/expenses">Spender</Link>
                 <nav>
-                  <Link to="/budgets">Budgets</Link>
+                  <Link to="/categories">Categories</Link>
                   <Link to="/settings">Settings</Link>
                   <a href="/" onClick={doSignOut}>
                     Sign out

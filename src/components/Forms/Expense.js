@@ -1,11 +1,4 @@
-import {
-  endOfMonth,
-  format,
-  getUnixTime,
-  fromUnixTime,
-  parseISO,
-  startOfMonth
-} from "date-fns";
+import { format, getUnixTime, fromUnixTime, parseISO } from "date-fns";
 import React, { Component } from "react";
 import { compose } from "recompose";
 import { DATE_FORMAT_ISO } from "../../constants/formats";
@@ -18,12 +11,12 @@ class Expense extends Component {
     loading: false,
     expense: {
       amount: "",
-      budgetId: "",
+      categoryId: "",
       date: format(new Date(), DATE_FORMAT_ISO),
       payee: "",
-      notes: ""
+      note: ""
     },
-    budgets: [],
+    categories: [],
     ...this.props.location.state
   };
 
@@ -34,10 +27,10 @@ class Expense extends Component {
       },
       firebase
     } = this.props;
-    const { expense, budgets } = this.state;
+    const { expense, categories } = this.state;
 
-    if (!budgets.length) {
-      this.fetchBudgets(expense.date);
+    if (!categories.length) {
+      this.fetchCategories(expense.date);
     }
 
     if (id && !expense.amount) {
@@ -49,16 +42,16 @@ class Expense extends Component {
         .get()
         .then(doc => {
           if (doc.exists) {
-            const { amount, budgetId, date, payee, notes } = doc.data();
+            const { amount, categoryId, date, payee, note } = doc.data();
 
             this.setState({
               expense: {
                 ...this.state.expense,
                 amount,
-                budgetId,
+                categoryId,
                 date: format(fromUnixTime(date), DATE_FORMAT_ISO),
                 payee,
-                notes
+                note
               }
             });
           }
@@ -69,25 +62,24 @@ class Expense extends Component {
     }
   }
 
-  fetchBudgets(currentDate) {
+  fetchCategories() {
     const { firebase, authUser } = this.props;
 
     this.setState({ loading: true });
 
-    this.unsubscribe = firebase
-      .budgets()
+    this.unsubscribeCategories = firebase
+      .categories()
       .where("userId", "==", authUser.uid)
-      .where("date", ">=", getUnixTime(startOfMonth(parseISO(currentDate))))
-      .where("date", "<=", getUnixTime(endOfMonth(parseISO(currentDate))))
-      .orderBy("date")
       .orderBy("name")
       .onSnapshot(snapshot => {
         if (snapshot.size) {
-          let budgets = [];
-          snapshot.forEach(doc => budgets.push({ ...doc.data(), id: doc.id }));
-          this.setState({ budgets });
+          let categories = [];
+          snapshot.forEach(doc =>
+            categories.push({ ...doc.data(), id: doc.id })
+          );
+          this.setState({ categories });
         } else {
-          this.setState({ budgets: [] });
+          this.setState({ categories: [] });
         }
 
         this.setState({ loading: false });
@@ -111,21 +103,11 @@ class Expense extends Component {
     });
   };
 
-  onDateChange = event => {
-    const date = event.target.value;
-
-    this.setState({
-      expense: { ...this.state.expense, date }
-    });
-
-    this.fetchBudgets(date);
-  };
-
   onSubmit = event => {
     event.preventDefault();
 
     const {
-      expense: { amount, budgetId, date, payee, notes }
+      expense: { amount, categoryId, date, payee, note }
     } = this.state;
     const {
       match: {
@@ -140,10 +122,10 @@ class Expense extends Component {
       // create
       firebase.expenses().add({
         amount: parseFloat(amount),
-        budgetId,
+        categoryId,
         date: getUnixTime(parseISO(date)),
         payee,
-        notes,
+        note,
         userId: authUser.uid
       });
     } else {
@@ -151,10 +133,10 @@ class Expense extends Component {
       firebase.expense(id).set(
         {
           amount: parseFloat(amount),
-          budgetId,
+          categoryId,
           date: getUnixTime(parseISO(date)),
           payee,
-          notes
+          note
         },
         { merge: true }
       );
@@ -182,7 +164,7 @@ class Expense extends Component {
         params: { id }
       }
     } = this.props;
-    const { loading, expense, budgets } = this.state;
+    const { loading, expense, categories } = this.state;
 
     if (loading) {
       return <Loading isCenter={true} />;
@@ -207,29 +189,23 @@ class Expense extends Component {
             />
           </div>
           <div className="form-input">
-            <label htmlFor="budget">Budget</label>
+            <label htmlFor="category">Category</label>
             <select
-              id="budgetId"
-              name="budgetId"
-              value={expense.budgetId}
+              id="category"
+              name="categoryId"
+              value={expense.categoryId}
               onChange={this.onInputChange}
               required
             >
               <option value="" disabled hidden>
-                Select a budget...
+                Select a category...
               </option>
-              {budgets.map(({ id, name }) => (
+              {categories.map(({ id, name }) => (
                 <option key={id} value={id}>
                   {name}
                 </option>
               ))}
             </select>
-            {!budgets.length ? (
-              <p className="danger mt2 mb0">
-                You have no budgets for the selected month.{" "}
-                <a href="/new/budget">Create one?</a>
-              </p>
-            ) : null}
           </div>
           <div className="form-input">
             <label htmlFor="date">Date</label>
@@ -238,7 +214,7 @@ class Expense extends Component {
               id="date"
               name="date"
               value={expense.date}
-              onChange={this.onDateChange}
+              onChange={this.onInputChange}
               required
             />
           </div>
@@ -254,13 +230,13 @@ class Expense extends Component {
             />
           </div>
           <div className="form-input">
-            <label htmlFor="notes">Notes</label>
+            <label htmlFor="note">Note</label>
             <input
               type="text"
-              id="notes"
-              name="notes"
+              id="note"
+              name="note"
               placeholder="Purchased with debit card"
-              value={expense.notes}
+              value={expense.note}
               onChange={this.onInputChange}
             />
           </div>
