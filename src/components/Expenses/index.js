@@ -13,11 +13,7 @@ import Blankslate from "../../components/Blankslate";
 import { DATE_FORMAT_ISO } from "../../constants/formats";
 import MonthNav from "../MonthNav";
 import { withAuthorization, withAuthUser } from "../Session";
-import {
-  formatAmountInCurrency,
-  formatAmountInPercent,
-  getTotalAmountFromArray
-} from "../utils";
+import { formatAmountInCurrency, getTotalAmountFromArray } from "../utils";
 import Loading from "../Loading";
 
 class Expenses extends Component {
@@ -162,15 +158,7 @@ class Expenses extends Component {
                         backgroundColor: color || "#212121"
                       }}
                     />
-                    {name} - {formatAmountInCurrency(amount, currency)}{" "}
-                    <small>
-                      (
-                      {formatAmountInPercent(
-                        (amount / getTotalAmountFromArray(expensesByCategory)) *
-                          100
-                      )}
-                      )
-                    </small>
+                    {name} - {formatAmountInCurrency(amount, currency)}
                   </li>
                 ))}
               </ol>
