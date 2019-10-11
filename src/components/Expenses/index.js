@@ -155,25 +155,22 @@ class Expenses extends Component {
             <div className="chart">
               <ol className="legend">
                 {expensesByCategory.map(({ id, name, color, amount }) => (
-                  <li key={id}>
+                  <li key={id} className="flex">
                     <span
                       className="color-pill"
                       style={{
                         backgroundColor: color || "#212121"
                       }}
                     />
-                    <span>
-                      {name} - {formatAmountInCurrency(amount, currency)}{" "}
-                      <small>
-                        (
-                        {formatAmountInPercent(
-                          (amount /
-                            getTotalAmountFromArray(expensesByCategory)) *
-                            100
-                        )}
-                        )
-                      </small>
-                    </span>
+                    {name} - {formatAmountInCurrency(amount, currency)}{" "}
+                    <small>
+                      (
+                      {formatAmountInPercent(
+                        (amount / getTotalAmountFromArray(expensesByCategory)) *
+                          100
+                      )}
+                      )
+                    </small>
                   </li>
                 ))}
               </ol>

@@ -69,14 +69,12 @@ class Categories extends Component {
                     state: { category: c }
                   }}
                 >
-                  <div className="category-title">
-                    <>
-                      <span
-                        className="color-pill"
-                        style={{ backgroundColor: c.color }}
-                      />
-                      {c.name}
-                    </>
+                  <div className="category-title flex">
+                    <span
+                      className="color-pill"
+                      style={{ backgroundColor: c.color }}
+                    />
+                    {c.name}
                   </div>
                 </Link>
               </li>
