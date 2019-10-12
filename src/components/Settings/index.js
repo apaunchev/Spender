@@ -28,7 +28,7 @@ class Settings extends Component {
     firebase
       .user(authUser.uid)
       .set({ currency }, { merge: true })
-      .then(() => (window.location.href = ROUTES.EXPENSES));
+      .then(() => (window.location.href = ROUTES.DASHBOARD));
   };
 
   render() {
@@ -37,12 +37,9 @@ class Settings extends Component {
     return (
       <main>
         <h1>Settings</h1>
-        <form className="form" onSubmit={this.onSubmit}>
-          <div className="form-input">
-            <label htmlFor="currency">Currency</label>
-            <p className="mb2">
-              <small>Controls the currency sign used across the app.</small>
-            </p>
+        <form onSubmit={this.onSubmit}>
+          <div>
+            <label htmlFor="currency">Default currency</label>
             <select
               name="currency"
               id="currency"
@@ -56,12 +53,8 @@ class Settings extends Component {
               ))}
             </select>
           </div>
-          <div className="form-input">
-            <input
-              type="submit"
-              className="button button--primary"
-              value="Save"
-            />
+          <div>
+            <input type="submit" value="Save" />
           </div>
         </form>
       </main>

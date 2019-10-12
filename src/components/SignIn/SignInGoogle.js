@@ -25,7 +25,7 @@ class SignInGoogle extends Component {
           { merge: true }
         );
         this.setState({ error: null });
-        this.props.history.push(ROUTES.EXPENSES);
+        this.props.history.push(ROUTES.DASHBOARD);
       })
       .catch(error => {
         this.setState({ error });
@@ -38,12 +38,10 @@ class SignInGoogle extends Component {
     return (
       <form onSubmit={this.onSubmit}>
         <p>
-          <button type="submit" className="button button--primary">
-            Sign in with Google
-          </button>
+          <button type="submit">Sign in with Google</button>
         </p>
 
-        {error && <p className="error">{error.message}</p>}
+        {error && <p>{error.message}</p>}
       </form>
     );
   }

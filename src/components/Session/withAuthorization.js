@@ -11,10 +11,10 @@ const withAuthorization = condition => Component => {
       this.listener = this.props.firebase.onAuthUserListener(
         authUser => {
           if (!condition(authUser)) {
-            this.props.history.push(ROUTES.INTRO);
+            this.props.history.push(ROUTES.DASHBOARD);
           }
         },
-        () => this.props.history.push(ROUTES.INTRO)
+        () => this.props.history.push(ROUTES.DASHBOARD)
       );
     }
 
