@@ -11,3 +11,8 @@ export const formatAmountInCurrency = (amount = 0, currency = "EUR") => {
 
   return formatter.format(amount);
 };
+
+export const fillRange = (start, end) =>
+  Array(end - start + 1)
+    .fill()
+    .map((item, index) => start + index);

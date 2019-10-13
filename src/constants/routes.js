@@ -1,4 +1,4 @@
-export const DASHBOARD = "/";
-export const SETTINGS = "/settings";
-export const ADD = "/add";
-export const EDIT = "/edit/:id";
+export const INTRO = "/";
+export const SUBSCRIPTIONS = "/subscriptions";
+export const UPDATE = "/subscription/:id";
+export const NEW = "/new";

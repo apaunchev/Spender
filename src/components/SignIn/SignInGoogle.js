@@ -11,9 +11,7 @@ class SignInGoogle extends Component {
     this.state = { error: null };
   }
 
-  onSubmit = event => {
-    event.preventDefault();
-
+  onSubmit = () => {
     this.props.firebase
       .doSignInWithGoogle()
       .then(authUser => {
@@ -24,25 +22,25 @@ class SignInGoogle extends Component {
           },
           { merge: true }
         );
+
         this.setState({ error: null });
-        this.props.history.push(ROUTES.DASHBOARD);
+
+        this.props.history.push(ROUTES.SUBSCRIPTIONS);
       })
-      .catch(error => {
-        this.setState({ error });
-      });
+      .catch(error => this.setState({ error }));
   };
 
   render() {
     const { error } = this.state;
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <p>
-          <button type="submit">Sign in with Google</button>
-        </p>
+      <>
+        <button className="button button--primary" onClick={this.onSubmit}>
+          Sign in with Google
+        </button>
 
-        {error && <p>{error.message}</p>}
-      </form>
+        {error && <p className="error">{error.message}</p>}
+      </>
     );
   }
 }
