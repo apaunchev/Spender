@@ -11,9 +11,7 @@ const Intro = () => (
         <Redirect to={ROUTES.SUBSCRIPTIONS} />
       ) : (
         <main className="jumbo">
-          <h1>
-            Spender is a simple tracker for your bills and recurring expenses.
-          </h1>
+          <h1>Spender is a simple tracker for your recurring expenses.</h1>
           <SignInGoogle />
         </main>
       )
