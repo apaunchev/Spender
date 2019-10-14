@@ -165,7 +165,7 @@ main > section {
   margin: 0.875rem 0;
   padding: 0 1rem;
   height: 60px;
-  border-radius: 5px;
+  border-radius: 4px;
   color: white;
   text-decoration: none;
 }
@@ -271,6 +271,13 @@ input[type="submit"],
 
 .form-input select,
 .form-input textarea,
+.form-input input[type] {
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+.form-input select,
+.form-input textarea,
 .form-input input[type="text"],
 .form-input input[type="number"],
 .form-input input[type="date"] {
@@ -281,8 +288,8 @@ input[type="submit"],
   padding: 0.25em 0.75em;
   background-color: var(--inputBackground);
   border: none;
-  border-radius: 0;
   border-bottom: 2px solid var(--border);
+  border-radius: 4px 4px 0 0;
   font: inherit;
 }
 
