@@ -16,3 +16,11 @@ export const fillRange = (start, end) =>
   Array(end - start + 1)
     .fill()
     .map((item, index) => start + index);
+
+export const groupBy = (list, prop) =>
+  list.reduce((a, b) => {
+    (a[b[prop]] = a[b[prop]] || []).push(b);
+    return a;
+  }, {});
+
+export const sumBy = (list, prop) => list.reduce((a, b) => a + b[prop], 0);

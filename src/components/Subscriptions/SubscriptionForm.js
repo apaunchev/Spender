@@ -17,9 +17,11 @@ class SubscriptionForm extends React.Component {
       name: "",
       description: "",
       color: "#000",
-      startedAt: "",
+      startsOn: "",
+      endsOn: "",
       repeatInterval: 1,
-      repeatMode: "month"
+      repeatMode: "month",
+      isActive: true
     },
     ...this.props.location.state
   };
@@ -47,9 +49,11 @@ class SubscriptionForm extends React.Component {
               name,
               description,
               color,
-              startedAt,
+              startsOn,
+              endsOn,
               repeatInterval,
-              repeatMode
+              repeatMode,
+              isActive
             } = doc.data();
 
             this.setState({
@@ -60,9 +64,11 @@ class SubscriptionForm extends React.Component {
                 name,
                 description,
                 color,
-                startedAt,
+                startsOn,
+                endsOn,
                 repeatInterval,
-                repeatMode
+                repeatMode,
+                isActive
               },
               loading: false
             });
@@ -95,9 +101,11 @@ class SubscriptionForm extends React.Component {
         name,
         description,
         color,
-        startedAt,
+        startsOn,
+        endsOn,
         repeatInterval,
-        repeatMode
+        repeatMode,
+        isActive
       }
     } = this.state;
     const {
@@ -117,9 +125,11 @@ class SubscriptionForm extends React.Component {
         name,
         description,
         color,
-        startedAt,
+        startsOn,
+        endsOn,
         repeatInterval,
         repeatMode,
+        isActive,
         createdAt: firebase.fieldValue.serverTimestamp(),
         userId: authUser.uid
       });
@@ -132,9 +142,11 @@ class SubscriptionForm extends React.Component {
           name,
           description,
           color,
-          startedAt,
+          startsOn,
+          endsOn,
           repeatInterval,
           repeatMode,
+          isActive,
           modifiedAt: firebase.fieldValue.serverTimestamp()
         },
         { merge: true }
@@ -161,13 +173,15 @@ class SubscriptionForm extends React.Component {
       loading,
       subscription: {
         amount,
+        currency,
         name,
         description,
         color,
-        startedAt,
+        startsOn,
+        endsOn,
         repeatMode,
         repeatInterval,
-        currency
+        isActive
       }
     } = this.state;
     const {
@@ -248,16 +262,28 @@ class SubscriptionForm extends React.Component {
               }
             />
           </div>
-          <div className="form-input">
-            <label htmlFor="startedAt">Billed on</label>
-            <input
-              id="startedAt"
-              name="startedAt"
-              type="date"
-              value={startedAt}
-              onChange={this.handleInputChange}
-            />
-          </div>
+          <grid columns="2">
+            <div className="form-input">
+              <label htmlFor="startsOn">Starts on</label>
+              <input
+                id="startsOn"
+                name="startsOn"
+                type="date"
+                value={startsOn}
+                onChange={this.handleInputChange}
+              />
+            </div>
+            <div className="form-input">
+              <label htmlFor="endsOn">Ends on</label>
+              <input
+                id="endsOn"
+                name="endsOn"
+                type="date"
+                value={endsOn}
+                onChange={this.handleInputChange}
+              />
+            </div>
+          </grid>
           <div className="form-input">
             <label htmlFor="repeatInterval">Repeats every</label>
             <grid columns="2">
@@ -293,6 +319,16 @@ class SubscriptionForm extends React.Component {
                 </option>
               </select>
             </grid>
+          </div>
+          <div className="form-input">
+            <label htmlFor="isActive">Active</label>
+            <input
+              id="isActive"
+              name="isActive"
+              type="checkbox"
+              checked={isActive}
+              onChange={this.handleInputChange}
+            />
           </div>
           <div className="form-input">
             <input type="submit" value="Save" />

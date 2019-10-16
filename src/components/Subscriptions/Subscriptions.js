@@ -5,6 +5,7 @@ import Blankslate from "../Blankslate";
 import Loading from "../Loading";
 import { withAuthorization, withAuthUser } from "../Session";
 import SubscriptionList from "./SubscriptionList";
+import SubscriptionSummary from "./SubscriptionSummary";
 import {
   addDays,
   addMonths,
@@ -20,8 +21,7 @@ class Subscriptions extends React.Component {
   state = {
     subscriptions: [],
     loading: false,
-    error: false,
-    orderBy: "name|asc"
+    error: false
   };
 
   componentDidMount() {
@@ -30,9 +30,8 @@ class Subscriptions extends React.Component {
 
   onListenForSubscriptions() {
     const { firebase, authUser } = this.props;
-    const { orderBy } = this.state;
 
-    const split = orderBy.split("|");
+    const split = ((authUser || {}).orderBy || {}).split("|");
     const field = split[0];
     const direction = split[1];
 
@@ -110,7 +109,7 @@ class Subscriptions extends React.Component {
   }
 
   render() {
-    const { loading, subscriptions, orderBy } = this.state;
+    const { loading, subscriptions } = this.state;
 
     if (loading) {
       return <Loading isCenter />;
@@ -118,36 +117,18 @@ class Subscriptions extends React.Component {
 
     return (
       <main>
-        <header className="flex flex--between mb3">
-          <div>
-            <h1 className="mb0">Subscriptions</h1>
-            <nav className="nav">
-              <Link to="/new">New subscription</Link>
-            </nav>
-          </div>
-          <form className="form mb0">
-            <div className="form-input mb0">
-              <label htmlFor="orderBy">Sort by</label>
-              <select
-                name="orderBy"
-                id="orderBy"
-                value={orderBy}
-                onChange={e =>
-                  this.setState({ orderBy: e.target.value }, () => {
-                    this.unsubscribe();
-                    this.onListenForSubscriptions();
-                  })
-                }
-              >
-                <option value="name|asc">Alphabetical</option>
-                <option value="amount|desc">Highest to lowest amount</option>
-                <option value="amount|asc">Lowest to highest amount</option>
-              </select>
-            </div>
-          </form>
+        <header className="mb3">
+          <h1 className="mb0">Subscriptions</h1>
+          <nav className="nav">
+            <Link to="/new">New subscription</Link>
+          </nav>
         </header>
         {subscriptions.length ? (
-          <SubscriptionList subscriptions={subscriptions} />
+          <>
+            <SubscriptionSummary subscriptions={subscriptions} />
+            <hr />
+            <SubscriptionList subscriptions={subscriptions} />
+          </>
         ) : (
           <Blankslate
             title="Nothing to show"
