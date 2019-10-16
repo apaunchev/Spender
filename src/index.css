@@ -271,7 +271,9 @@ input[type="submit"],
 
 .form-input select,
 .form-input textarea,
-.form-input input[type] {
+.form-input input[type="text"],
+.form-input input[type="number"],
+.form-input input[type="date"] {
   -webkit-appearance: none;
   border-radius: 0;
 }
