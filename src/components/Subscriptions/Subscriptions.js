@@ -136,11 +136,9 @@ class Subscriptions extends React.Component {
 
     return (
       <main>
-        <header className="mb3">
+        <header className="mb3 flex flex--between">
           <h1 className="mb0">Subscriptions</h1>
-          <nav className="nav">
-            <Link to="/new">New subscription</Link>
-          </nav>
+          <Link to="/new">New subscription</Link>
         </header>
         {subscriptions.length ? (
           <>
