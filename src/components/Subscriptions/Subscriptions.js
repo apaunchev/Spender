@@ -117,9 +117,12 @@ class Subscriptions extends React.Component {
 
   toggleMode = () => {
     const current = this.state.mode;
+
     if (current === "month") {
       this.setState({ mode: "year" });
-    } else {
+    } else if (current === "year") {
+      this.setState({ mode: "week" });
+    } else if (current === "week") {
       this.setState({ mode: "month" });
     }
   };

@@ -296,9 +296,6 @@ class SubscriptionForm extends React.Component {
                 value={repeatMode}
                 onChange={this.handleInputChange}
               >
-                <option key="day" value="day">
-                  Day(s)
-                </option>
                 <option key="week" value="week">
                   Week(s)
                 </option>
