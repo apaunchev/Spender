@@ -20,8 +20,7 @@ class SubscriptionForm extends React.Component {
       startsOn: "",
       endsOn: "",
       repeatInterval: 1,
-      repeatMode: "month",
-      isActive: true
+      repeatMode: "month"
     },
     ...this.props.location.state
   };
@@ -52,8 +51,7 @@ class SubscriptionForm extends React.Component {
               startsOn,
               endsOn,
               repeatInterval,
-              repeatMode,
-              isActive
+              repeatMode
             } = doc.data();
 
             this.setState({
@@ -67,8 +65,7 @@ class SubscriptionForm extends React.Component {
                 startsOn,
                 endsOn,
                 repeatInterval,
-                repeatMode,
-                isActive
+                repeatMode
               },
               loading: false
             });
@@ -104,8 +101,7 @@ class SubscriptionForm extends React.Component {
         startsOn,
         endsOn,
         repeatInterval,
-        repeatMode,
-        isActive
+        repeatMode
       }
     } = this.state;
     const {
@@ -129,7 +125,6 @@ class SubscriptionForm extends React.Component {
         endsOn,
         repeatInterval,
         repeatMode,
-        isActive,
         createdAt: firebase.fieldValue.serverTimestamp(),
         userId: authUser.uid
       });
@@ -146,7 +141,6 @@ class SubscriptionForm extends React.Component {
           endsOn,
           repeatInterval,
           repeatMode,
-          isActive,
           modifiedAt: firebase.fieldValue.serverTimestamp()
         },
         { merge: true }
@@ -180,8 +174,7 @@ class SubscriptionForm extends React.Component {
         startsOn,
         endsOn,
         repeatMode,
-        repeatInterval,
-        isActive
+        repeatInterval
       }
     } = this.state;
     const {
@@ -262,28 +255,26 @@ class SubscriptionForm extends React.Component {
               }
             />
           </div>
-          <grid columns="2">
-            <div className="form-input">
-              <label htmlFor="startsOn">Starts on</label>
-              <input
-                id="startsOn"
-                name="startsOn"
-                type="date"
-                value={startsOn}
-                onChange={this.handleInputChange}
-              />
-            </div>
-            <div className="form-input">
-              <label htmlFor="endsOn">Ends on</label>
-              <input
-                id="endsOn"
-                name="endsOn"
-                type="date"
-                value={endsOn}
-                onChange={this.handleInputChange}
-              />
-            </div>
-          </grid>
+          <div className="form-input">
+            <label htmlFor="startsOn">Starts on</label>
+            <input
+              id="startsOn"
+              name="startsOn"
+              type="date"
+              value={startsOn}
+              onChange={this.handleInputChange}
+            />
+          </div>
+          <div className="form-input">
+            <label htmlFor="endsOn">Ends on</label>
+            <input
+              id="endsOn"
+              name="endsOn"
+              type="date"
+              value={endsOn}
+              onChange={this.handleInputChange}
+            />
+          </div>
           <div className="form-input">
             <label htmlFor="repeatInterval">Repeats every</label>
             <grid columns="2">
@@ -319,16 +310,6 @@ class SubscriptionForm extends React.Component {
                 </option>
               </select>
             </grid>
-          </div>
-          <div className="form-input">
-            <label htmlFor="isActive">Active</label>
-            <input
-              id="isActive"
-              name="isActive"
-              type="checkbox"
-              checked={isActive}
-              onChange={this.handleInputChange}
-            />
           </div>
           <div className="form-input">
             <input type="submit" value="Save" />

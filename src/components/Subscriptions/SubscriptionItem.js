@@ -4,22 +4,13 @@ import { Link } from "react-router-dom";
 import { formatAmountInCurrency } from "../utils";
 
 const SubscriptionItem = ({
-  subscription: {
-    id,
-    amount,
-    currency,
-    name,
-    description,
-    color,
-    dueDate,
-    isActive
-  }
+  subscription: { id, amount, currency, name, description, color, dueDate }
 }) => (
   <li>
     <Link
       to={`/subscription/${id}`}
       className="subscription-item"
-      style={{ backgroundColor: color, opacity: isActive ? 1 : 0.5 }}
+      style={{ backgroundColor: color }}
     >
       <div>
         <span className="subscription-item-title">{name}</span>

@@ -191,6 +191,20 @@ main > section {
   text-transform: uppercase;
 }
 
+.subscription-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  margin: 1.5rem 0;
+  border-top: 3px solid var(--border);
+}
+
+.subscription-summary > div {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Blankslate */
 
 .blankslate {

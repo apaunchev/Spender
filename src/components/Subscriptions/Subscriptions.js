@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
 import { compose } from "recompose";
 import Blankslate from "../Blankslate";
@@ -20,28 +21,33 @@ import {
 class Subscriptions extends React.Component {
   state = {
     subscriptions: [],
+    rates: [],
     loading: false,
-    error: false
+    error: false,
+    mode: "month"
   };
 
   componentDidMount() {
-    this.onListenForSubscriptions();
+    this.onListenForData();
   }
 
-  onListenForSubscriptions() {
-    const { firebase, authUser } = this.props;
+  async fetchRates() {
+    const response = await fetch(
+      `https://api.openrates.io/latest?base=${this.props.authUser.currency}`
+    );
+    const json = await response.json();
 
-    const split = ((authUser || {}).orderBy || {}).split("|");
-    const field = split[0];
-    const direction = split[1];
+    return json.rates;
+  }
 
+  onListenForData() {
     this.setState({ loading: true });
 
-    this.unsubscribe = firebase
+    this.unsubscribe = this.props.firebase
       .subscriptions()
-      .where("userId", "==", authUser.uid)
-      .orderBy(field, direction)
-      .onSnapshot(snapshot => {
+      .where("userId", "==", this.props.authUser.uid)
+      .orderBy("name")
+      .onSnapshot(async snapshot => {
         if (snapshot.size) {
           let subscriptions = [];
 
@@ -54,15 +60,17 @@ class Subscriptions extends React.Component {
             ...s,
             dueDate: this.getSubscriptionDueDate(
               now,
-              s.startedAt,
+              s.startsOn,
               s.repeatMode,
               s.repeatInterval
             )
           }));
 
-          this.setState({ subscriptions, loading: false });
+          const rates = await this.fetchRates();
+
+          this.setState({ subscriptions, rates, loading: false });
         } else {
-          this.setState({ subscriptions: [], loading: false });
+          this.setState({ subscriptions: [], rates: [], loading: false });
         }
       });
   }
@@ -71,35 +79,35 @@ class Subscriptions extends React.Component {
     this.unsubscribe();
   }
 
-  getSubscriptionDueDate(now, startedAt, repeatMode, repeatInterval) {
-    if (!now || !startedAt) return null;
+  getSubscriptionDueDate(now, startsOn, repeatMode, repeatInterval) {
+    if (!now || !startsOn) return null;
 
-    const startedAtAsDate = parseISO(startedAt);
+    const startsOnAsDate = parseISO(startsOn);
 
-    if (!isValid(startedAtAsDate)) return null;
+    if (!isValid(startsOnAsDate)) return null;
 
-    if (isFuture(startedAtAsDate)) {
-      return startedAtAsDate;
+    if (isFuture(startsOnAsDate)) {
+      return startsOnAsDate;
     }
 
-    if (isPast(startedAtAsDate)) {
+    if (isPast(startsOnAsDate)) {
       let nextDate = null;
 
       switch (repeatMode) {
         case "day":
-          nextDate = addDays(startedAtAsDate, repeatInterval);
+          nextDate = addDays(startsOnAsDate, repeatInterval);
           break;
         case "week":
-          nextDate = addWeeks(startedAtAsDate, repeatInterval);
+          nextDate = addWeeks(startsOnAsDate, repeatInterval);
           break;
         case "month":
-          nextDate = addMonths(startedAtAsDate, repeatInterval);
+          nextDate = addMonths(startsOnAsDate, repeatInterval);
           break;
         case "year":
-          nextDate = addYears(startedAtAsDate, repeatInterval);
+          nextDate = addYears(startsOnAsDate, repeatInterval);
           break;
         default:
-          nextDate = addMonths(startedAtAsDate, repeatInterval);
+          nextDate = addMonths(startsOnAsDate, repeatInterval);
       }
 
       return nextDate;
@@ -108,8 +116,17 @@ class Subscriptions extends React.Component {
     return null;
   }
 
+  toggleMode = () => {
+    const current = this.state.mode;
+    if (current === "month") {
+      this.setState({ mode: "year" });
+    } else {
+      this.setState({ mode: "month" });
+    }
+  };
+
   render() {
-    const { loading, subscriptions } = this.state;
+    const { loading, subscriptions, rates, mode } = this.state;
 
     if (loading) {
       return <Loading isCenter />;
@@ -125,9 +142,13 @@ class Subscriptions extends React.Component {
         </header>
         {subscriptions.length ? (
           <>
-            <SubscriptionSummary subscriptions={subscriptions} />
-            <hr />
             <SubscriptionList subscriptions={subscriptions} />
+            <SubscriptionSummary
+              subscriptions={subscriptions}
+              rates={rates}
+              mode={mode}
+              onToggleMode={this.toggleMode}
+            />
           </>
         ) : (
           <Blankslate

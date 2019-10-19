@@ -1,62 +1,87 @@
-import axios from "axios";
 import React from "react";
-import Loading from "../Loading";
 import { withAuthUser } from "../Session";
-import { formatAmountInCurrency, groupBy, sumBy } from "../utils";
+import { formatAmountInCurrency, sumBy } from "../utils";
 
 class SubscriptionSummary extends React.Component {
   state = {
-    loading: false,
-    rates: [],
-    baseCurrency: this.props.authUser.currency || "EUR"
+    subscriptions: []
   };
 
   componentDidMount() {
-    this.setState({ loading: true });
-
-    axios
-      .get(`https://api.openrates.io/latest?base=${this.state.baseCurrency}`)
-      .then(res => this.setState({ rates: res.data.rates, loading: false }));
+    this.formatSubscriptions();
   }
 
-  getConvertedAmount(amount, currency) {
-    return amount / this.state.rates[currency];
-  }
+  getConvertedAmount = (amount, currency) =>
+    amount / this.props.rates[currency];
 
-  render() {
-    const filtered = this.props.subscriptions.filter(s => s.isActive);
-    const grouped = groupBy(filtered, "currency");
-    const groups = Object.keys(grouped).map(currency => {
-      const group = grouped[currency];
-      const baseTotal = sumBy(group, "amount");
+  formatSubscriptions = () => {
+    const subscriptions = this.props.subscriptions.map(s => {
+      let amountConverted = this.getConvertedAmount(s.amount, s.currency);
+      let amountPerDay = 0;
+      let amountPerWeek = 0;
+      let amountPerMonth = 0;
+      let amountPerYear = 0;
+
+      if (s.repeatMode === "day") {
+        amountPerDay = amountConverted;
+        amountPerWeek = amountConverted * 7;
+        amountPerMonth = amountConverted * 30;
+        amountPerYear = amountConverted * 365;
+      } else if (s.repeatMode === "week") {
+        amountPerDay = amountConverted / 7;
+        amountPerWeek = amountConverted;
+        amountPerMonth = amountConverted * 4;
+        amountPerYear = amountConverted * 52;
+      } else if (s.repeatMode === "month") {
+        amountPerDay = amountConverted / 30;
+        amountPerWeek = amountConverted / 4;
+        amountPerMonth = amountConverted;
+        amountPerYear = amountConverted * 12;
+      } else if (s.repeatMode === "year") {
+        amountPerDay = amountConverted / 365;
+        amountPerWeek = amountConverted / 52;
+        amountPerMonth = amountConverted / 12;
+        amountPerYear = amountConverted;
+      }
 
       return {
-        count: group.length,
-        currency,
-        baseTotal,
-        convertedTotal: this.getConvertedAmount(baseTotal, currency)
+        ...s,
+        amountConverted,
+        amountPerDay,
+        amountPerWeek,
+        amountPerMonth,
+        amountPerYear
       };
     });
 
-    if (this.state.loading) {
-      return <Loading />;
-    }
+    this.setState({ subscriptions });
+  };
+
+  handleToggleMode = () => {
+    this.props.onToggleMode();
+  };
+
+  render() {
+    const mode =
+      this.props.mode === "month" ? "amountPerMonth" : "amountPerYear";
 
     return (
-      <>
-        <ul>
-          {groups.map(({ count, currency, baseTotal, convertedTotal }) => (
-            <li key={currency}>
-              {currency} / {count} subscriptions /{" "}
-              {formatAmountInCurrency(baseTotal, currency)} /{" "}
-              {formatAmountInCurrency(
-                convertedTotal,
-                this.props.authUser.currency
-              )}
-            </li>
-          ))}
-        </ul>
-      </>
+      <div className="subscription-summary" onClick={this.handleToggleMode}>
+        <div>
+          <span className="subscription-item-title">Average Expenses</span>
+          <span className="subscription-item-subtitle">
+            Per {this.props.mode}
+          </span>
+        </div>
+        <div className="tar">
+          <span className="subscription-item-title">
+            {formatAmountInCurrency(
+              sumBy(this.state.subscriptions, mode),
+              this.props.authUser.currency
+            )}
+          </span>
+        </div>
+      </div>
     );
   }
 }
