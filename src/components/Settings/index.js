@@ -3,29 +3,56 @@ import CURRENCIES from "../../constants/currencies";
 import * as ROUTES from "../../constants/routes";
 import { withAuthUser, withAuthorization } from "../Session";
 import { compose } from "recompose";
+import Loading from "../Loading";
 
 class Settings extends Component {
   state = {
-    currency: this.props.authUser.currency || "EUR",
-    orderBy: this.props.authUser.orderBy || "name|asc",
-    showTotalAs: this.props.authUser.showTotalAs || "average"
+    loading: false,
+    user: {
+      currency: "",
+      orderBy: ""
+    }
   };
+
+  componentDidMount() {
+    const { firebase, authUser } = this.props;
+
+    this.setState({ loading: true });
+
+    firebase
+      .user(authUser.uid)
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          const { currency, orderBy } = doc.data();
+
+          this.setState({
+            user: { currency, orderBy },
+            loading: false
+          });
+        } else {
+          this.setState({ loading: false });
+        }
+      });
+  }
 
   onInputChange = event => {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
     const name = target.name;
 
-    this.setState({ [name]: value });
+    this.setState({ user: { [name]: value } });
   };
 
   onSubmit = event => {
     event.preventDefault();
 
-    this.props.firebase
-      .user(this.props.authUser.uid)
-      .set({ ...this.state }, { merge: true })
-      .then(() => (window.location.href = ROUTES.SUBSCRIPTIONS));
+    const { firebase, authUser, history } = this.props;
+
+    firebase
+      .user(authUser.uid)
+      .set({ ...this.state.user }, { merge: true })
+      .then(() => history.push(ROUTES.SUBSCRIPTIONS));
   };
 
   onSignOut = event => {
@@ -35,7 +62,14 @@ class Settings extends Component {
   };
 
   render() {
-    const { currency, orderBy, showTotalAs } = this.state;
+    const {
+      loading,
+      user: { currency, orderBy }
+    } = this.state;
+
+    if (loading) {
+      return <Loading isCenter />;
+    }
 
     return (
       <main>
@@ -57,7 +91,7 @@ class Settings extends Component {
             </select>
           </div>
           <div className="form-input">
-            <label htmlFor="orderBy">Order by</label>
+            <label htmlFor="orderBy">Order subscriptions by</label>
             <select
               name="orderBy"
               id="orderBy"
@@ -67,19 +101,6 @@ class Settings extends Component {
               <option value="name|asc">Name</option>
               <option value="amount|desc">Highest to lowest amount</option>
               <option value="amount|asc">Lowest to highest amount</option>
-            </select>
-          </div>
-          <div className="form-input">
-            <label htmlFor="showTotalAs">Show total as</label>
-            <select
-              name="showTotalAs"
-              id="showTotalAs"
-              value={showTotalAs}
-              onChange={this.onInputChange}
-            >
-              <option value="average">Average expenses</option>
-              <option value="remaining">Remaining expenses</option>
-              <option value="total">Total expenses</option>
             </select>
           </div>
           <div className="form-input">

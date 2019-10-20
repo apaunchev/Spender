@@ -347,12 +347,12 @@ input[type="submit"],
 
 /* Grid */
 
-grid {
+.grid {
   display: grid;
   grid-gap: 1.5rem;
 }
 
-grid[columns="2"] {
+.grid[data-columns="2"] {
   grid-template-columns: repeat(2, 1fr);
 }
 

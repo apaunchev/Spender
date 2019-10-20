@@ -6,7 +6,6 @@ import * as ROUTES from "../../constants/routes";
 import { withFirebase } from "../Firebase";
 import Loading from "../Loading";
 import { withAuthorization, withAuthUser } from "../Session";
-import { fillRange } from "../utils";
 
 class SubscriptionForm extends React.Component {
   state = {
@@ -19,7 +18,6 @@ class SubscriptionForm extends React.Component {
       color: "#000",
       startsOn: "",
       endsOn: "",
-      repeatInterval: 1,
       repeatMode: "month"
     },
     ...this.props.location.state
@@ -50,7 +48,6 @@ class SubscriptionForm extends React.Component {
               color,
               startsOn,
               endsOn,
-              repeatInterval,
               repeatMode
             } = doc.data();
 
@@ -64,7 +61,6 @@ class SubscriptionForm extends React.Component {
                 color,
                 startsOn,
                 endsOn,
-                repeatInterval,
                 repeatMode
               },
               loading: false
@@ -100,7 +96,6 @@ class SubscriptionForm extends React.Component {
         color,
         startsOn,
         endsOn,
-        repeatInterval,
         repeatMode
       }
     } = this.state;
@@ -123,7 +118,6 @@ class SubscriptionForm extends React.Component {
         color,
         startsOn,
         endsOn,
-        repeatInterval,
         repeatMode,
         createdAt: firebase.fieldValue.serverTimestamp(),
         userId: authUser.uid
@@ -139,7 +133,6 @@ class SubscriptionForm extends React.Component {
           color,
           startsOn,
           endsOn,
-          repeatInterval,
           repeatMode,
           modifiedAt: firebase.fieldValue.serverTimestamp()
         },
@@ -173,8 +166,7 @@ class SubscriptionForm extends React.Component {
         color,
         startsOn,
         endsOn,
-        repeatMode,
-        repeatInterval
+        repeatMode
       }
     } = this.state;
     const {
@@ -194,32 +186,37 @@ class SubscriptionForm extends React.Component {
         </header>
         <form className="form" onSubmit={this.handleSubmit}>
           <div className="form-input">
-            <label htmlFor="amount">Amount</label>
-            <grid columns="2">
-              <input
-                id="amount"
-                name="amount"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="9.99"
-                value={amount}
-                onChange={this.handleInputChange}
-                required
-              />
-              <select
-                name="currency"
-                id="currency"
-                value={currency}
-                onChange={this.handleInputChange}
-              >
-                {CURRENCIES.map((c, idx) => (
-                  <option key={`${c}-${idx}`} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </grid>
+            <div className="grid" data-columns="2">
+              <div>
+                <label htmlFor="amount">Amount</label>
+                <input
+                  id="amount"
+                  name="amount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="9.99"
+                  value={amount}
+                  onChange={this.handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="currency">Currency</label>
+                <select
+                  name="currency"
+                  id="currency"
+                  value={currency}
+                  onChange={this.handleInputChange}
+                >
+                  {CURRENCIES.map((c, idx) => (
+                    <option key={`${c}-${idx}`} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
           <div className="form-input">
             <label htmlFor="name">Name</label>
@@ -276,37 +273,23 @@ class SubscriptionForm extends React.Component {
             />
           </div>
           <div className="form-input">
-            <label htmlFor="repeatInterval">Repeats every</label>
-            <grid columns="2">
-              <select
-                id="repeatInterval"
-                name="repeatInterval"
-                value={repeatInterval}
-                onChange={this.handleInputChange}
-              >
-                {fillRange(1, 30).map(key => (
-                  <option key={key} value={key}>
-                    {key}
-                  </option>
-                ))}
-              </select>
-              <select
-                id="repeatMode"
-                name="repeatMode"
-                value={repeatMode}
-                onChange={this.handleInputChange}
-              >
-                <option key="week" value="week">
-                  Week(s)
-                </option>
-                <option key="month" value="month">
-                  Month(s)
-                </option>
-                <option key="year" value="year">
-                  Year(s)
-                </option>
-              </select>
-            </grid>
+            <label htmlFor="repeatMode">Repeats every</label>
+            <select
+              id="repeatMode"
+              name="repeatMode"
+              value={repeatMode}
+              onChange={this.handleInputChange}
+            >
+              <option key="week" value="week">
+                Week
+              </option>
+              <option key="month" value="month">
+                Month
+              </option>
+              <option key="year" value="year">
+                Year
+              </option>
+            </select>
           </div>
           <div className="form-input">
             <input type="submit" value="Save" />

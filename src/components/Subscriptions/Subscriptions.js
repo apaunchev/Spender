@@ -6,23 +6,12 @@ import Loading from "../Loading";
 import { withAuthorization, withAuthUser } from "../Session";
 import SubscriptionList from "./SubscriptionList";
 import SubscriptionSummary from "./SubscriptionSummary";
-import {
-  addDays,
-  addMonths,
-  addWeeks,
-  addYears,
-  isFuture,
-  isPast,
-  isValid,
-  parseISO
-} from "date-fns";
 
 class Subscriptions extends React.Component {
   state = {
     subscriptions: [],
-    rates: [],
+    currency: "",
     loading: false,
-    error: false,
     mode: "month"
   };
 
@@ -30,9 +19,9 @@ class Subscriptions extends React.Component {
     this.onListenForData();
   }
 
-  async fetchRates() {
+  async fetchRates(currency) {
     const response = await fetch(
-      `https://api.openrates.io/latest?base=${this.props.authUser.currency}`
+      `https://api.openrates.io/latest?base=${currency}`
     );
     const json = await response.json();
 
@@ -40,79 +29,75 @@ class Subscriptions extends React.Component {
   }
 
   onListenForData() {
+    const { firebase, authUser } = this.props;
+
     this.setState({ loading: true });
 
-    this.unsubscribe = this.props.firebase
-      .subscriptions()
-      .where("userId", "==", this.props.authUser.uid)
-      .orderBy("name")
-      .onSnapshot(async snapshot => {
-        if (snapshot.size) {
-          let subscriptions = [];
+    firebase
+      .user(authUser.uid)
+      .get()
+      .then(async doc => {
+        if (doc.exists) {
+          const { currency, orderBy } = doc.data();
+          const [field, direction] = orderBy.split("|");
+          const rates = await this.fetchRates(currency);
+          const mapFn = subscription => {
+            const amountConverted =
+              subscription.amount / rates[subscription.currency] ||
+              subscription.amount;
+            let amountPerWeek = 0;
+            let amountPerMonth = 0;
+            let amountPerYear = 0;
 
-          snapshot.forEach(doc =>
-            subscriptions.push({ ...doc.data(), id: doc.id })
-          );
+            if (subscription.repeatMode === "week") {
+              amountPerWeek = amountConverted;
+              amountPerMonth = amountConverted * 4;
+              amountPerYear = amountConverted * 52;
+            } else if (subscription.repeatMode === "month") {
+              amountPerWeek = amountConverted / 4;
+              amountPerMonth = amountConverted;
+              amountPerYear = amountConverted * 12;
+            } else if (subscription.repeatMode === "year") {
+              amountPerWeek = amountConverted / 52;
+              amountPerMonth = amountConverted / 12;
+              amountPerYear = amountConverted;
+            }
 
-          const now = new Date();
-          subscriptions = subscriptions.map(s => ({
-            ...s,
-            dueDate: this.getSubscriptionDueDate(
-              now,
-              s.startsOn,
-              s.repeatMode,
-              s.repeatInterval
-            )
-          }));
+            return {
+              ...subscription,
+              amountPerWeek,
+              amountPerMonth,
+              amountPerYear,
+              dueDate: null
+            };
+          };
 
-          const rates = await this.fetchRates();
+          firebase
+            .subscriptions()
+            .where("userId", "==", authUser.uid)
+            .orderBy(field, direction)
+            .get()
+            .then(snapshot => {
+              if (snapshot.size) {
+                let subscriptions = [];
 
-          this.setState({ subscriptions, rates, loading: false });
-        } else {
-          this.setState({ subscriptions: [], rates: [], loading: false });
+                snapshot.forEach(doc =>
+                  subscriptions.push({ ...doc.data(), id: doc.id })
+                );
+
+                subscriptions = subscriptions.map(mapFn);
+
+                this.setState({ subscriptions, currency, loading: false });
+              } else {
+                this.setState({
+                  subscriptions: [],
+                  currency: "",
+                  loading: false
+                });
+              }
+            });
         }
       });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-
-  getSubscriptionDueDate(now, startsOn, repeatMode, repeatInterval) {
-    if (!now || !startsOn) return null;
-
-    const startsOnAsDate = parseISO(startsOn);
-
-    if (!isValid(startsOnAsDate)) return null;
-
-    if (isFuture(startsOnAsDate)) {
-      return startsOnAsDate;
-    }
-
-    if (isPast(startsOnAsDate)) {
-      let nextDate = null;
-
-      switch (repeatMode) {
-        case "day":
-          nextDate = addDays(startsOnAsDate, repeatInterval);
-          break;
-        case "week":
-          nextDate = addWeeks(startsOnAsDate, repeatInterval);
-          break;
-        case "month":
-          nextDate = addMonths(startsOnAsDate, repeatInterval);
-          break;
-        case "year":
-          nextDate = addYears(startsOnAsDate, repeatInterval);
-          break;
-        default:
-          nextDate = addMonths(startsOnAsDate, repeatInterval);
-      }
-
-      return nextDate;
-    }
-
-    return null;
   }
 
   toggleMode = () => {
@@ -128,7 +113,7 @@ class Subscriptions extends React.Component {
   };
 
   render() {
-    const { loading, subscriptions, rates, mode } = this.state;
+    const { loading, subscriptions, currency, mode } = this.state;
 
     if (loading) {
       return <Loading isCenter />;
@@ -136,7 +121,7 @@ class Subscriptions extends React.Component {
 
     return (
       <main>
-        <header className="mb3 flex flex--between">
+        <header className="mb3">
           <h1 className="mb0">Subscriptions</h1>
           <Link to="/new">New subscription</Link>
         </header>
@@ -145,7 +130,7 @@ class Subscriptions extends React.Component {
             <SubscriptionList subscriptions={subscriptions} />
             <SubscriptionSummary
               subscriptions={subscriptions}
-              rates={rates}
+              currency={currency}
               mode={mode}
               onToggleMode={this.toggleMode}
             />
