@@ -17,7 +17,6 @@ class SubscriptionForm extends React.Component {
       description: "",
       color: "#000",
       startsOn: "",
-      endsOn: "",
       repeatMode: "month"
     },
     ...this.props.location.state
@@ -47,7 +46,6 @@ class SubscriptionForm extends React.Component {
               description,
               color,
               startsOn,
-              endsOn,
               repeatMode
             } = doc.data();
 
@@ -60,7 +58,6 @@ class SubscriptionForm extends React.Component {
                 description,
                 color,
                 startsOn,
-                endsOn,
                 repeatMode
               },
               loading: false
@@ -95,7 +92,6 @@ class SubscriptionForm extends React.Component {
         description,
         color,
         startsOn,
-        endsOn,
         repeatMode
       }
     } = this.state;
@@ -117,7 +113,6 @@ class SubscriptionForm extends React.Component {
         description,
         color,
         startsOn,
-        endsOn,
         repeatMode,
         createdAt: firebase.fieldValue.serverTimestamp(),
         userId: authUser.uid
@@ -132,7 +127,6 @@ class SubscriptionForm extends React.Component {
           description,
           color,
           startsOn,
-          endsOn,
           repeatMode,
           modifiedAt: firebase.fieldValue.serverTimestamp()
         },
@@ -165,7 +159,6 @@ class SubscriptionForm extends React.Component {
         description,
         color,
         startsOn,
-        endsOn,
         repeatMode
       }
     } = this.state;
@@ -259,16 +252,6 @@ class SubscriptionForm extends React.Component {
               name="startsOn"
               type="date"
               value={startsOn}
-              onChange={this.handleInputChange}
-            />
-          </div>
-          <div className="form-input">
-            <label htmlFor="endsOn">Ends on</label>
-            <input
-              id="endsOn"
-              name="endsOn"
-              type="date"
-              value={endsOn}
               onChange={this.handleInputChange}
             />
           </div>
