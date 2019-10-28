@@ -215,6 +215,10 @@ main > section {
   text-align: center;
 }
 
+.blankslate > :last-child {
+  margin-bottom: 0;
+}
+
 /* Loading */
 
 .loading {
