@@ -24,7 +24,7 @@ const SubscriptionItem = ({
         </span>
         {dueDate && (
           <span className="subscription-item-subtitle">
-            {formatDistanceStrict(new Date(), dueDate)}
+            {formatDistanceStrict(dueDate, new Date(), { addSuffix: true })}
           </span>
         )}
       </div>
