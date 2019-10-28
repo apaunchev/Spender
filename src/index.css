@@ -411,7 +411,7 @@ input[type="submit"],
 }
 
 .jumbo {
-  font-size: 125% !important;
+  font-size: 150% !important;
 }
 
 @media (max-width: 600px) {
