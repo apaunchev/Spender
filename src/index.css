@@ -114,7 +114,7 @@ main > section {
   left: 0;
   right: 0;
   z-index: 1;
-  border-bottom: 3px solid var(--text);
+  border-bottom: 3px solid var(--border);
   margin-bottom: 3rem;
 }
 
@@ -254,7 +254,6 @@ input[type="submit"] {
 button:hover {
   background-color: var(--inputFocus);
   color: var(--text);
-  text-decoration: none;
 }
 
 input[type="submit"],
@@ -262,6 +261,12 @@ input[type="submit"],
 .button--primary:hover {
   color: white;
   background-color: var(--accent);
+}
+
+input[type="submit"]:hover,
+button:hover,
+.button:hover {
+  text-decoration: underline;
 }
 
 .button-group {
