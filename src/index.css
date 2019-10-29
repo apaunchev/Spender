@@ -18,6 +18,17 @@
   --divider: var(--grey1);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: var(--grey2);
+    --background: var(--grey0);
+    --inputBackground: rgba(255, 255, 255, 0.1);
+    --inputFocus: rgba(215, 228, 250, 0.2);
+    --border: var(--grey1);
+    --divider: var(--grey1);
+  }
+}
+
 *,
 *:before,
 *:after {
