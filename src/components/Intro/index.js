@@ -11,9 +11,7 @@ const Intro = () => (
         <Redirect to={ROUTES.SUBSCRIPTIONS} />
       ) : (
         <main className="jumbo">
-          <h1>
-            Spender helps you <mark>track your subscriptions</mark>.
-          </h1>
+          <h1>Spender helps you track your subscriptions.</h1>
           <p>
             You need to enter each of your subscriptions (e.g. streaming
             service, mobile carrier, broadband), along with how much it costs

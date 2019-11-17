@@ -10,7 +10,6 @@
 
   --text: var(--grey0);
   --accent: var(--blue);
-  --highlight: var(--yellow);
   --background: var(--grey2);
   --inputBackground: rgba(0, 0, 0, 0.05);
   --inputFocus: rgba(4, 89, 219, 0.1);
@@ -73,16 +72,6 @@ a {
 a:hover {
   color: var(--accent);
   text-decoration: underline;
-}
-
-::selection,
-mark {
-  background-color: var(--highlight);
-  color: var(--text);
-}
-
-:focus {
-  outline: 3px solid var(--highlight);
 }
 
 hr {
