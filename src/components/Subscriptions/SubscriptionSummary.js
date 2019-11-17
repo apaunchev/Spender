@@ -1,5 +1,4 @@
 import React from "react";
-import { withAuthUser } from "../Session";
 import { formatAmountInCurrency } from "../utils";
 
 class SubscriptionSummary extends React.Component {
@@ -8,22 +7,39 @@ class SubscriptionSummary extends React.Component {
   };
 
   render() {
-    const { mode, averages, currency } = this.props;
+    const { mode, summary, currency, totalAs } = this.props;
 
     return (
       <div className="subscription-summary" onClick={this.handleToggleMode}>
-        <div>
-          <span className="subscription-item-title">Average Expenses</span>
-          <span className="subscription-item-subtitle">Per {mode}</span>
-        </div>
-        <div className="tar">
-          <span className="subscription-item-title">
-            {formatAmountInCurrency(averages[mode], currency)}
-          </span>
-        </div>
+        {totalAs === "average" ? (
+          <>
+            <div>
+              <span className="subscription-item-title">Average expenses</span>
+              <span className="subscription-item-subtitle">Per {mode}</span>
+            </div>
+            <div className="tar">
+              <span className="subscription-item-title">
+                {formatAmountInCurrency(summary["average"][mode], currency)}
+              </span>
+            </div>
+          </>
+        ) : null}
+        {totalAs === "remaining" ? (
+          <>
+            <div>
+              <span className="subscription-item-title">Total expenses</span>
+              <span className="subscription-item-subtitle">This {mode}</span>
+            </div>
+            <div className="tar">
+              <span className="subscription-item-title">
+                {formatAmountInCurrency(summary["remaining"][mode], currency)}
+              </span>
+            </div>
+          </>
+        ) : null}
       </div>
     );
   }
 }
 
-export default withAuthUser(SubscriptionSummary);
+export default SubscriptionSummary;

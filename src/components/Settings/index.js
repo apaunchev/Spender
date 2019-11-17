@@ -10,7 +10,8 @@ class Settings extends Component {
     loading: false,
     user: {
       currency: "",
-      orderBy: ""
+      orderBy: "",
+      totalAs: ""
     }
   };
 
@@ -24,10 +25,10 @@ class Settings extends Component {
       .get()
       .then(doc => {
         if (doc.exists) {
-          const { currency, orderBy } = doc.data();
+          const { currency, orderBy, totalAs } = doc.data();
 
           this.setState({
-            user: { currency, orderBy },
+            user: { currency, orderBy, totalAs },
             loading: false
           });
         } else {
@@ -41,7 +42,7 @@ class Settings extends Component {
     const value = target.type === "checkbox" ? target.checked : target.value;
     const name = target.name;
 
-    this.setState({ user: { [name]: value } });
+    this.setState({ user: { ...this.state.user, [name]: value } });
   };
 
   onSubmit = event => {
@@ -51,7 +52,13 @@ class Settings extends Component {
 
     firebase
       .user(authUser.uid)
-      .set({ ...this.state.user }, { merge: true })
+      .set(
+        {
+          ...this.state.user,
+          modifiedAt: firebase.fieldValue.serverTimestamp()
+        },
+        { merge: true }
+      )
       .then(() => history.push(ROUTES.SUBSCRIPTIONS));
   };
 
@@ -64,7 +71,7 @@ class Settings extends Component {
   render() {
     const {
       loading,
-      user: { currency, orderBy }
+      user: { currency, orderBy, totalAs }
     } = this.state;
 
     if (loading) {
@@ -104,6 +111,18 @@ class Settings extends Component {
             </select>
           </div>
           <div className="form-input">
+            <label htmlFor="totalAs">View total as</label>
+            <select
+              name="totalAs"
+              id="totalAs"
+              value={totalAs}
+              onChange={this.onInputChange}
+            >
+              <option value="average">Average expenses</option>
+              <option value="remaining">Remaining expenses</option>
+            </select>
+          </div>
+          <div className="form-input">
             <input
               type="submit"
               className="button button--primary"
@@ -123,7 +142,4 @@ class Settings extends Component {
 
 const condition = authUser => !!authUser;
 
-export default compose(
-  withAuthUser,
-  withAuthorization(condition)
-)(Settings);
+export default compose(withAuthUser, withAuthorization(condition))(Settings);

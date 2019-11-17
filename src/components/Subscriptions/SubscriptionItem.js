@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import { formatAmountInCurrency } from "../utils";
 
 const SubscriptionItem = ({
-  subscription: { id, amount, currency, name, description, color, dueDate }
+  subscription: { id, amount, name, description, color, dueDate },
+  currency
 }) => (
   <li>
     <Link

@@ -15,7 +15,11 @@ import {
   differenceInMonths,
   differenceInWeeks,
   addMonths,
-  addWeeks
+  addWeeks,
+  endOfWeek,
+  endOfMonth,
+  endOfYear,
+  isBefore
 } from "date-fns";
 
 const MODES = {
@@ -24,11 +28,31 @@ const MODES = {
   YEAR: "year"
 };
 
+const SUMMARY_INITIAL_STATE = {
+  average: {
+    week: 0,
+    month: 0,
+    year: 0
+  },
+  remaining: {
+    week: 0,
+    month: 0,
+    year: 0
+  }
+};
+
+const DEFAULTS = {
+  currency: "EUR",
+  orderBy: "name|asc",
+  totalAs: "average"
+};
+
 class Subscriptions extends React.Component {
   state = {
     subscriptions: [],
-    averages: {},
+    summary: {},
     currency: "",
+    totalAs: "",
     loading: false,
     mode: MODES.MONTH
   };
@@ -46,6 +70,124 @@ class Subscriptions extends React.Component {
     return json.rates;
   }
 
+  getNextDueDate = (date, repeatMode) => {
+    const firstDue = parseISO(date);
+
+    if (!isValid(firstDue)) return null;
+
+    // if first due date is in the future, return it now
+    if (isFuture(firstDue)) return firstDue;
+
+    // otherwise, we assume it is in the past and need to calculate it
+    const now = new Date();
+
+    if (repeatMode === MODES.WEEK) {
+      return addWeeks(firstDue, Math.abs(differenceInWeeks(firstDue, now)) + 1);
+    }
+
+    if (repeatMode === MODES.MONTH) {
+      return addMonths(
+        firstDue,
+        Math.abs(differenceInMonths(firstDue, now)) + 1
+      );
+    }
+
+    if (repeatMode === MODES.YEAR) {
+      return addYears(firstDue, Math.abs(differenceInYears(firstDue, now)) + 1);
+    }
+  };
+
+  getAverageAmounts = (amount, repeatMode) => {
+    const average = { week: 0, month: 0, year: 0 };
+
+    if (repeatMode === MODES.WEEK) {
+      average.week = amount;
+      average.month = amount * 4;
+      average.year = amount * 52;
+    }
+
+    if (repeatMode === MODES.MONTH) {
+      average.week = amount / 4;
+      average.month = amount;
+      average.year = amount * 12;
+    }
+
+    if (repeatMode === MODES.YEAR) {
+      average.week = amount / 52;
+      average.month = amount / 12;
+      average.year = amount;
+    }
+
+    return average;
+  };
+
+  getRemainingAmounts = (amount, repeatMode, dueDate) => {
+    const now = new Date();
+    const endOf = {
+      week: endOfWeek(now),
+      month: endOfMonth(now),
+      year: endOfYear(now)
+    };
+    let currentDueDate = dueDate;
+    let remaining = { week: 0, month: 0, year: 0 };
+
+    if (repeatMode === MODES.WEEK) {
+      while (isBefore(currentDueDate, endOf.year)) {
+        if (isBefore(currentDueDate, endOf.week)) {
+          remaining.week += amount;
+        }
+
+        if (isBefore(currentDueDate, endOf.month)) {
+          remaining.month += amount;
+        }
+
+        if (isBefore(currentDueDate, endOf.year)) {
+          remaining.year += amount;
+        }
+
+        currentDueDate = addWeeks(currentDueDate, 1);
+      }
+    }
+
+    if (repeatMode === MODES.MONTH) {
+      while (isBefore(currentDueDate, endOf.year)) {
+        if (isBefore(currentDueDate, endOf.week)) {
+          remaining.week += amount;
+        }
+
+        if (isBefore(currentDueDate, endOf.month)) {
+          remaining.month += amount;
+        }
+
+        if (isBefore(currentDueDate, endOf.year)) {
+          remaining.year += amount;
+        }
+
+        currentDueDate = addMonths(currentDueDate, 1);
+      }
+    }
+
+    if (repeatMode === MODES.YEAR) {
+      while (isBefore(currentDueDate, endOf.year)) {
+        if (isBefore(currentDueDate, endOf.week)) {
+          remaining.week += amount;
+        }
+
+        if (isBefore(currentDueDate, endOf.month)) {
+          remaining.month += amount;
+        }
+
+        if (isBefore(currentDueDate, endOf.year)) {
+          remaining.year += amount;
+        }
+
+        currentDueDate = addYears(currentDueDate, 1);
+      }
+    }
+
+    return remaining;
+  };
+
   onListenForData() {
     const { firebase, authUser } = this.props;
 
@@ -56,78 +198,47 @@ class Subscriptions extends React.Component {
       .get()
       .then(async doc => {
         if (doc.exists) {
-          const { currency, orderBy } = doc.data();
+          const data = doc.data();
+          const currency = data.currency || DEFAULTS.currency;
+          const totalAs = data.totalAs || DEFAULTS.totalAs;
+          const orderBy = data.orderBy || DEFAULTS.orderBy;
           const [field, direction] = orderBy.split("|");
           const rates = await this.fetchRates(currency);
-
-          const getNextDueDate = (date, repeatMode) => {
-            const firstDue = parseISO(date);
-
-            if (!isValid(firstDue)) return null;
-
-            // if first due date is in the future, return it now
-            if (isFuture(firstDue)) return firstDue;
-
-            // otherwise, we assume it is in the past and need to calculate it
-            const now = new Date();
-
-            if (repeatMode === MODES.WEEK) {
-              return addWeeks(
-                firstDue,
-                Math.abs(differenceInWeeks(firstDue, now)) + 1
-              );
-            }
-
-            if (repeatMode === MODES.MONTH) {
-              return addMonths(
-                firstDue,
-                Math.abs(differenceInMonths(firstDue, now)) + 1
-              );
-            }
-
-            if (repeatMode === MODES.YEAR) {
-              return addYears(
-                firstDue,
-                Math.abs(differenceInYears(firstDue, now)) + 1
-              );
-            }
-          };
-
           const mapFn = sub => {
-            const dueDate = getNextDueDate(sub.startsOn, sub.repeatMode);
+            const dueDate = this.getNextDueDate(sub.startsOn, sub.repeatMode);
             const amount = sub.amount / rates[sub.currency] || sub.amount;
-
-            return { ...sub, amount, dueDate };
-          };
-
-          const reduceFn = (acc, curr) => {
-            const { amount, repeatMode } = curr;
-            let week = 0;
-            let month = 0;
-            let year = 0;
-
-            if (repeatMode === MODES.WEEK) {
-              week = amount;
-              month = amount * 4;
-              year = amount * 52;
-            }
-
-            if (repeatMode === MODES.MONTH) {
-              week = amount / 4;
-              month = amount;
-              year = amount * 12;
-            }
-
-            if (repeatMode === MODES.YEAR) {
-              week = amount / 52;
-              month = amount / 12;
-              year = amount;
-            }
+            const averageAmounts = this.getAverageAmounts(
+              amount,
+              sub.repeatMode
+            );
+            const remainingAmounts = this.getRemainingAmounts(
+              amount,
+              sub.repeatMode,
+              dueDate
+            );
 
             return {
-              week: acc.week + week,
-              month: acc.month + month,
-              year: acc.year + year
+              ...sub,
+              amount,
+              dueDate,
+              averageAmounts,
+              remainingAmounts
+            };
+          };
+          const reduceFn = (acc, curr) => {
+            const { averageAmounts, remainingAmounts } = curr;
+
+            return {
+              average: {
+                week: acc.average.week + averageAmounts.week,
+                month: acc.average.month + averageAmounts.month,
+                year: acc.average.year + averageAmounts.year
+              },
+              remaining: {
+                week: acc.remaining.week + remainingAmounts.week,
+                month: acc.remaining.month + remainingAmounts.month,
+                year: acc.remaining.year + remainingAmounts.year
+              }
             };
           };
 
@@ -139,26 +250,28 @@ class Subscriptions extends React.Component {
             .then(snapshot => {
               if (snapshot.size) {
                 let subscriptions = [];
-                let averages = { week: 0, month: 0, year: 0 };
+                let summary = SUMMARY_INITIAL_STATE;
 
                 snapshot.forEach(doc =>
                   subscriptions.push({ ...doc.data(), id: doc.id })
                 );
 
                 subscriptions = subscriptions.map(mapFn);
-                averages = subscriptions.reduce(reduceFn, averages);
+                summary = subscriptions.reduce(reduceFn, summary);
 
                 this.setState({
                   subscriptions,
-                  averages,
+                  summary,
                   currency,
+                  totalAs,
                   loading: false
                 });
               } else {
                 this.setState({
                   subscriptions: [],
-                  averages: {},
+                  summary: {},
                   currency: "",
+                  totalAs: "",
                   loading: false
                 });
               }
@@ -180,7 +293,14 @@ class Subscriptions extends React.Component {
   };
 
   render() {
-    const { loading, subscriptions, averages, currency, mode } = this.state;
+    const {
+      loading,
+      subscriptions,
+      summary,
+      currency,
+      totalAs,
+      mode
+    } = this.state;
 
     if (loading) {
       return <Loading isCenter />;
@@ -194,10 +314,14 @@ class Subscriptions extends React.Component {
         </header>
         {subscriptions.length ? (
           <>
-            <SubscriptionList subscriptions={subscriptions} />
-            <SubscriptionSummary
-              averages={averages}
+            <SubscriptionList
+              subscriptions={subscriptions}
               currency={currency}
+            />
+            <SubscriptionSummary
+              summary={summary}
+              currency={currency}
+              totalAs={totalAs}
               mode={mode}
               onToggleMode={this.toggleMode}
             />
