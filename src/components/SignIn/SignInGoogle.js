@@ -12,20 +12,23 @@ class SignInGoogle extends Component {
   }
 
   onSubmit = () => {
-    this.props.firebase
+    const { firebase, history } = this.props;
+
+    firebase
       .doSignInWithGoogle()
       .then(authUser => {
-        this.props.firebase.user(authUser.user.uid).set(
+        firebase.user(authUser.user.uid).set(
           {
             username: authUser.user.displayName,
-            email: authUser.user.email
+            email: authUser.user.email,
+            signedInAt: firebase.fieldValue.serverTimestamp()
           },
           { merge: true }
         );
 
         this.setState({ error: null });
 
-        this.props.history.push(ROUTES.SUBSCRIPTIONS);
+        history.push(ROUTES.SUBSCRIPTIONS);
       })
       .catch(error => this.setState({ error }));
   };
@@ -45,7 +48,4 @@ class SignInGoogle extends Component {
   }
 }
 
-export default compose(
-  withRouter,
-  withFirebase
-)(SignInGoogle);
+export default compose(withRouter, withFirebase)(SignInGoogle);
