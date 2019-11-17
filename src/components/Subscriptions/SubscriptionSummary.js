@@ -27,7 +27,9 @@ class SubscriptionSummary extends React.Component {
         {totalAs === "remaining" ? (
           <>
             <div>
-              <span className="subscription-item-title">Total expenses</span>
+              <span className="subscription-item-title">
+                Remaining expenses
+              </span>
               <span className="subscription-item-subtitle">This {mode}</span>
             </div>
             <div className="tar">
