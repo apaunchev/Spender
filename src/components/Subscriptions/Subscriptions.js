@@ -25,11 +25,10 @@ class Subscriptions extends React.Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.subscriptions.length !== prevProps.subscriptions.length) {
-      this.processSubscriptions(this.props.subscriptions);
-    }
-
-    if (prevState.orderBy !== this.state.orderBy) {
+    if (
+      prevProps.subscriptions.length !== this.props.subscriptions.length ||
+      prevState.orderBy !== this.state.orderBy
+    ) {
       this.processSubscriptions(this.props.subscriptions);
     }
   }
