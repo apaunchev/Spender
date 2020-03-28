@@ -47,7 +47,7 @@ class Settings extends Component {
   onSubmit = event => {
     event.preventDefault();
 
-    const { firebase, authUser, history } = this.props;
+    const { firebase, authUser } = this.props;
 
     firebase
       .user(authUser.uid)
@@ -58,7 +58,7 @@ class Settings extends Component {
         },
         { merge: true }
       )
-      .then(() => history.push(ROUTES.SUBSCRIPTIONS));
+      .then(() => (window.location = ROUTES.SUBSCRIPTIONS));
   };
 
   onSignOut = event => {
