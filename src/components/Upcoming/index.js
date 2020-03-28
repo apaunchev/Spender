@@ -1,7 +1,6 @@
 import { format, parseISO, isSameMonth, addMonths } from "date-fns";
 import React from "react";
 import { compose } from "recompose";
-import Blankslate from "../Blankslate";
 import Loading from "../Loading";
 import { withAuthorization } from "../Session";
 import { SubscriptionList } from "../Subscriptions";
@@ -70,30 +69,25 @@ class Upcoming extends React.Component {
         <header className="mb3">
           <h1 className="mb0">Upcoming</h1>
         </header>
-        {upcoming.map(({ id, subscriptions }) => (
-          <div key={id}>
-            <header className="flex flex--between">
-              <h2 className="mb0">{format(parseISO(id), "MMMM yyyy")}</h2>
-              <span className="subscription-item-title">
-                {formatAmountInCurrency(
-                  sumBy(subscriptions, "amount"),
-                  this.props.authUser.currency
-                )}
-              </span>
-            </header>
-            {subscriptions.length ? (
+        {upcoming.map(({ id, subscriptions }) =>
+          subscriptions.length ? (
+            <div key={id}>
+              <header className="flex flex--between">
+                <h2 className="mb0">{format(parseISO(id), "MMMM yyyy")}</h2>
+                <span className="subscription-item-title">
+                  {formatAmountInCurrency(
+                    sumBy(subscriptions, "amount"),
+                    this.props.authUser.currency
+                  )}
+                </span>
+              </header>
               <SubscriptionList
                 subscriptions={subscriptions}
                 currency={this.props.authUser.currency}
               />
-            ) : (
-              <Blankslate
-                title="Nothing to show"
-                description="Looks like you don't have any subscriptions for this month yet."
-              />
-            )}
-          </div>
-        ))}
+            </div>
+          ) : null
+        )}
       </main>
     );
   }
