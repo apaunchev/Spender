@@ -24,7 +24,7 @@ const SubscriptionItem = ({
           {formatAmountInCurrency(amount, currency)}
         </span>
         {dueDate && (
-          <span className="subscription-item-subtitle">
+          <span className="subscription-item-subtitle" title={dueDate}>
             {formatDistanceStrict(dueDate, new Date(), { addSuffix: true })}
           </span>
         )}

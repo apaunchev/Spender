@@ -7,6 +7,7 @@ import Settings from "../Settings";
 import NoMatch from "../NoMatch";
 import { withAuthentication } from "../Session";
 import { SubscriptionForm, Subscriptions } from "../Subscriptions";
+import Upcoming from "../Upcoming";
 
 const App = () => (
   <Router>
@@ -17,6 +18,8 @@ const App = () => (
       <Route exact path={ROUTES.SUBSCRIPTIONS} component={Subscriptions} />
       <Route exact path={ROUTES.UPDATE} component={SubscriptionForm} />
       <Route exact path={ROUTES.NEW} component={SubscriptionForm} />
+
+      <Route exact path={ROUTES.UPCOMING} component={Upcoming} />
 
       <Route exact path={ROUTES.SETTINGS} component={Settings} />
 

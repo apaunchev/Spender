@@ -10,7 +10,6 @@ class Settings extends Component {
     loading: false,
     user: {
       currency: "",
-      orderBy: "",
       totalAs: ""
     }
   };
@@ -25,10 +24,10 @@ class Settings extends Component {
       .get()
       .then(doc => {
         if (doc.exists) {
-          const { currency, orderBy, totalAs } = doc.data();
+          const { currency, totalAs } = doc.data();
 
           this.setState({
-            user: { currency, orderBy, totalAs },
+            user: { currency, totalAs },
             loading: false
           });
         } else {
@@ -71,7 +70,7 @@ class Settings extends Component {
   render() {
     const {
       loading,
-      user: { currency, orderBy, totalAs }
+      user: { currency, totalAs }
     } = this.state;
 
     if (loading) {
@@ -95,19 +94,6 @@ class Settings extends Component {
                   {c}
                 </option>
               ))}
-            </select>
-          </div>
-          <div className="form-input">
-            <label htmlFor="orderBy">Order subscriptions by</label>
-            <select
-              name="orderBy"
-              id="orderBy"
-              value={orderBy}
-              onChange={this.onInputChange}
-            >
-              <option value="name|asc">Name</option>
-              <option value="amount|desc">Highest to lowest amount</option>
-              <option value="amount|asc">Lowest to highest amount</option>
             </select>
           </div>
           <div className="form-input">

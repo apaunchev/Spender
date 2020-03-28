@@ -9,8 +9,10 @@ const Header = () => (
         {authUser =>
           authUser ? (
             <>
-              <Link to="/subscriptions">Spender</Link>
+              <Link to="/">Spender</Link>
               <nav>
+                <Link to="/subscriptions">Dashboard</Link>
+                <Link to="/upcoming">Upcoming</Link>
                 <Link to="/settings">Settings</Link>
               </nav>
             </>
