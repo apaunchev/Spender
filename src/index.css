@@ -220,6 +220,44 @@ main > section {
   flex-direction: column;
 }
 
+/* Chart */
+
+.chart {
+  background-color: var(--inputBackground);
+  padding: 0.75rem;
+}
+
+.chart__list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-gap: 1rem;
+}
+
+.chart__item > a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.chart__item__bar {
+  display: flex;
+  margin: auto 0 0.25rem;
+}
+
+.chart__item__bar__segment {
+  width: 0.75rem;
+  max-height: 100px;
+  background-color: var(--blue);
+}
+
+.chart__item__label {
+  font-size: 0.85rem;
+}
+
 /* Blankslate */
 
 .blankslate {
@@ -508,4 +546,14 @@ button:hover,
   .small-screen-only {
     display: inline-block;
   }
+}
+
+.scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
 }
